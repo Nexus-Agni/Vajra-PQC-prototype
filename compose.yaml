@@ -1,0 +1,12 @@
+services:
+  qstie-ca-bootstrap:
+    build:
+      context: .
+      dockerfile: docker/qstie-ca/Dockerfile
+    volumes:
+      - ./pki:/app/pki
+      - ./results:/app/results
+      - ./packages/qstie-trust/tests:/app/tests
+    environment:
+      - GIT_COMMIT=${GIT_COMMIT}
+      - DOCKER_IMAGE_INFO=${DOCKER_IMAGE_INFO}

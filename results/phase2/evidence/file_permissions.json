@@ -1,0 +1,32 @@
+[
+  {
+    "path": "pki/ca/root_ca.key",
+    "expected_mode": "0o600",
+    "actual_mode": "0o600",
+    "result": "PASS"
+  },
+  {
+    "path": "pki/gateway_raw/raw_gateway.key",
+    "expected_mode": "0o600",
+    "actual_mode": "0o600",
+    "result": "PASS"
+  },
+  {
+    "path": "pki/gateway_raw/raw_ml_dsa65.pem",
+    "expected_mode": "0o600",
+    "actual_mode": "0o600",
+    "result": "PASS"
+  },
+  {
+    "path": "pki/gateway_nia/nia_gateway.key",
+    "expected_mode": "0o600",
+    "actual_mode": "0o600",
+    "result": "PASS"
+  },
+  {
+    "path": "pki/gateway_nia/nia_ml_dsa65.pem",
+    "expected_mode": "0o600",
+    "actual_mode": "0o600",
+    "result": "PASS"
+  }
+]
