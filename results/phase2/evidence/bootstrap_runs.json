@@ -1,0 +1,24 @@
+[
+    {
+        "run_id":  "run-1",
+        "timestamp":  "2026-08-20T17:54:24.206177+00:00",
+        "git_commit":  "1ed2505ab9fdcad2f43f3689de9f2fb7659e66c4",
+        "python_version":  "3.14.6",
+        "openssl_version":  "OpenSSL 3.5.7 9 Jun 2026",
+        "docker_image":  "docker.io/library/prototype-implementation-main-qstie-ca-bootstrap:latest",
+        "exit_status":  0,
+        "runtime_duration":  7.115082,
+        "validation_result":  "PASS"
+    },
+    {
+        "run_id":  "run-2",
+        "timestamp":  "2026-08-20T17:56:28.191114+00:00",
+        "git_commit":  "1ed2505ab9fdcad2f43f3689de9f2fb7659e66c4",
+        "python_version":  "3.14.6",
+        "openssl_version":  "OpenSSL 3.5.7 9 Jun 2026",
+        "docker_image":  "docker.io/library/prototype-implementation-main-qstie-ca-bootstrap:latest",
+        "exit_status":  0,
+        "runtime_duration":  3.016622,
+        "validation_result":  "PASS"
+    }
+]

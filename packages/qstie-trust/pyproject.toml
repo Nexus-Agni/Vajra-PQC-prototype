@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qstie_trust"
+version = "0.1.0"
+description = "QS-TIE Trust and Key Management Phase 2"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "cryptography",
+    "pyyaml",
+    "qstie_common"
+]
+
+[project.scripts]
+qstie-ca = "qstie_trust.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["qstie_trust*"]

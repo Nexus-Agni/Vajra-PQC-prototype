@@ -1,0 +1,14 @@
+[
+  {
+    "agency": "RAW",
+    "tls_public_key_fingerprint": "29b51c6b293ff1ec5a256b4821c62892ed23dbcfa0d94985ff04e418d6333e5d",
+    "payload_signing_public_key_fingerprint": "8f8cd3ecbaaf451a74475ec547af26e73199c2748d457021cd8554b33e6902a8",
+    "comparison_result": "different = PASS"
+  },
+  {
+    "agency": "NIA",
+    "tls_public_key_fingerprint": "d05664c19df0f4a34138d3dbfde19118e8d569e476923bce27eac88331d18c59",
+    "payload_signing_public_key_fingerprint": "6571545978339e8e8c30ef614fdb1570ef30f8dc12e9acfc3e7fbc6dbff00b3c",
+    "comparison_result": "different = PASS"
+  }
+]

@@ -1,4 +1,8 @@
 VAJRA-PQC_QS-TIE_PID_v2.1_PHASE0_FROZEN_FINAL.md
+HLD_QS-TIE_Gateway_A_Sender_FINAL.md
+VAJRA-PQC_Revised_Architecture_FINAL.md
+HLD_QS-TIE_Trust_And_Key_Management_FINAL.md
+HLD_QS-TIE_Gateway_B_Receiver_FINAL.md
 
 # Virtual Environments
 venv/
@@ -38,3 +42,4 @@ build/
 results/phase1/raw/
 results/phase1/logs/
 *.log
+pki/
