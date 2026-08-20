@@ -1,0 +1,27 @@
+[
+  {
+    "scenario": "empty",
+    "protobuf_payload_size_bytes": 11,
+    "complete_frame_size_bytes": 16
+  },
+  {
+    "scenario": "normal",
+    "protobuf_payload_size_bytes": 73,
+    "complete_frame_size_bytes": 78
+  },
+  {
+    "scenario": "unicode",
+    "protobuf_payload_size_bytes": 58,
+    "complete_frame_size_bytes": 63
+  },
+  {
+    "scenario": "binary_signature",
+    "protobuf_payload_size_bytes": 2045,
+    "complete_frame_size_bytes": 2050
+  },
+  {
+    "scenario": "large_payload",
+    "protobuf_payload_size_bytes": 1000045,
+    "complete_frame_size_bytes": 1000050
+  }
+]

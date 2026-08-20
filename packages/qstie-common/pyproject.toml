@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qstie_common"
+version = "0.1.0"
+description = "QS-TIE Shared Contract for Phase 1"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "protobuf",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["qstie_common*"]

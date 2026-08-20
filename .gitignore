@@ -1,0 +1,40 @@
+VAJRA-PQC_QS-TIE_PID_v2.1_PHASE0_FROZEN_FINAL.md
+
+# Virtual Environments
+venv/
+env/
+.env
+
+# Python byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Pytest / Testing
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Protobuf generated code
+*_pb2.py
+*_pb2.pyi
+*_pb2_grpc.py
+*_pb2_grpc.pyi
+
+# Packaging
+*.egg-info/
+dist/
+build/
+*.egg
+
+# IDE / OS Files
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Temporary execution artifacts and logs
+results/phase1/raw/
+results/phase1/logs/
+*.log

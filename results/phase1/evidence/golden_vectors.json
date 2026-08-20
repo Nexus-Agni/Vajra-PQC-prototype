@@ -1,0 +1,16 @@
+[
+  {
+    "name": "normal",
+    "transaction_id": "tx-normal",
+    "pb_size": 132,
+    "frame_size": 137,
+    "frame_hex_prefix": "01000000840a0974782d"
+  },
+  {
+    "name": "unicode",
+    "transaction_id": "tx-unicode",
+    "pb_size": 73,
+    "frame_size": 78,
+    "frame_hex_prefix": "01000000490a0a74782d"
+  }
+]

@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package qstie;
+
+message TransactionEnvelope {
+  string transaction_id = 1;
+  string sender_id = 2;
+  string recipient_id = 3;
+  string tlp_marking = 4;
+  bytes  stix_bundle_compressed = 5;
+  bytes  signature = 6;
+  string signer_cert_fingerprint = 7;
+  int64  created_at_unix_ms = 8;
+}
