@@ -10,3 +10,16 @@ services:
     environment:
       - GIT_COMMIT=${GIT_COMMIT}
       - DOCKER_IMAGE_INFO=${DOCKER_IMAGE_INFO}
+
+  gateway-b:
+    build:
+      context: .
+      dockerfile: docker/gateway_b/Dockerfile
+    volumes:
+      - ./pki:/app/pki
+      - ./results:/app/results
+      - ./gateway_b:/app/gateway_b
+      - ./tests/phase3:/app/tests/phase3
+    environment:
+      - OPENCTI_API_TOKEN=synthetic-token-for-testing
+

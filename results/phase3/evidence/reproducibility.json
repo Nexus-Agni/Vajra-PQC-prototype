@@ -1,0 +1,16 @@
+{
+  "git_commit": "f2febb580686950c89c9b51c0da206d5eb60bc7b",
+  "git_branch": "phase-3",
+  "git_status": "dirty",
+  "docker_version": "Docker version 28.5.1, build e180ab8",
+  "compose_version": "Docker Compose version v2.40.0-desktop.1",
+  "image_name": "gateway_b",
+  "image_tag": "latest",
+  "image_id": "20f34e7afdcb",
+  "image_digest": "gateway_b@sha256:20f34e7afdcb2c9c8c25ff4cb9385a24307f892ec6d86baae8a3c385629531de",
+  "container_id": "NOT_AVAILABLE",
+  "python_version": "NOT_AVAILABLE",
+  "openssl_version": "NOT_AVAILABLE",
+  "operating_system": "NOT_AVAILABLE",
+  "test_timestamp": "2026-08-25T16:04:15.090215+00:00"
+}

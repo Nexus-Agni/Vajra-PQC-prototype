@@ -1,0 +1,49 @@
+[
+  {
+    "test": "tls_no_cert",
+    "err": null,
+    "pass": true
+  },
+  {
+    "test": "happy_path",
+    "mtype": "ACK",
+    "reason": null,
+    "pass": true
+  },
+  {
+    "test": "identity_mismatch",
+    "mtype": "NACK",
+    "reason": "IDENTITY_MISMATCH",
+    "pass": true
+  },
+  {
+    "test": "invalid_sig",
+    "mtype": "NACK",
+    "reason": "SIG_INVALID",
+    "pass": true
+  },
+  {
+    "test": "modified_compressed",
+    "mtype": "NACK",
+    "reason": "SIG_INVALID",
+    "pass": true
+  },
+  {
+    "test": "policy_denied",
+    "mtype": "NACK",
+    "reason": "POLICY_DENIED",
+    "pass": true
+  },
+  {
+    "test": "malformed_stix",
+    "mtype": "NACK",
+    "reason": "MALFORMED",
+    "pass": true
+  },
+  {
+    "test": "opencti_reject",
+    "mtype": "NACK",
+    "reason": "INGEST_FAILED",
+    "pass": true
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "test": "no_client_cert",
+    "environment": "docker",
+    "expected": "connection_closed_or_empty",
+    "actual": "connection_closed_or_empty",
+    "response": "{\"status\": \"connection_closed_or_empty\"}",
+    "opencti_calls": 0,
+    "pass": true
+  },
+  {
+    "test": "wrong_cert",
+    "environment": "docker",
+    "expected": "connection_closed_or_empty",
+    "actual": "connection_closed_or_empty",
+    "response": "{\"status\": \"connection_closed_or_empty\"}",
+    "opencti_calls": 0,
+    "pass": true
+  },
+  {
+    "test": "forged_sender",
+    "environment": "docker",
+    "expected": "IDENTITY_MISMATCH",
+    "actual": "IDENTITY_MISMATCH",
+    "response": "{\"status\": \"received\", \"msg_type\": \"3\", \"body\": {\"transaction_id\": \"tx-man-1\", \"reason\": \"IDENTITY_MISMATCH\"}}",
+    "opencti_calls": 0,
+    "pass": true
+  },
+  {
+    "test": "modified_sig",
+    "environment": "docker",
+    "expected": "SIG_INVALID",
+    "actual": "SIG_INVALID",
+    "response": "{\"status\": \"received\", \"msg_type\": \"3\", \"body\": {\"transaction_id\": \"tx-man-2\", \"reason\": \"SIG_INVALID\"}}",
+    "opencti_calls": 0,
+    "pass": true
+  },
+  {
+    "test": "modified_compressed",
+    "environment": "docker",
+    "expected": "SIG_INVALID",
+    "actual": "SIG_INVALID",
+    "response": "{\"status\": \"received\", \"msg_type\": \"3\", \"body\": {\"transaction_id\": \"tx-man-3\", \"reason\": \"SIG_INVALID\"}}",
+    "opencti_calls": 0,
+    "pass": true
+  },
+  {
+    "test": "denied_tlp",
+    "environment": "docker",
+    "expected": "POLICY_DENIED",
+    "actual": "POLICY_DENIED",
+    "response": "{\"status\": \"received\", \"msg_type\": \"3\", \"body\": {\"transaction_id\": \"tx-man-4\", \"reason\": \"POLICY_DENIED\"}}",
+    "opencti_calls": 0,
+    "pass": true
+  },
+  {
+    "test": "malformed_frame",
+    "environment": "docker",
+    "expected": "connection_closed_or_empty",
+    "actual": "connection_closed_or_empty",
+    "response": "{\"status\": \"connection_closed_or_empty\"}",
+    "opencti_calls": 0,
+    "pass": true
+  },
+  {
+    "test": "malformed_stix",
+    "environment": "docker",
+    "expected": "MALFORMED",
+    "actual": "MALFORMED",
+    "response": "{\"status\": \"received\", \"msg_type\": \"3\", \"body\": {\"transaction_id\": \"tx-man-6\", \"reason\": \"MALFORMED\"}}",
+    "opencti_calls": 0,
+    "pass": true
+  }
+]
