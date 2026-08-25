@@ -1,0 +1,37 @@
+[
+  {
+    "run_id": "repeat-1",
+    "iteration": 1,
+    "test_name": "integration_suite",
+    "result": "PASS",
+    "environment": "docker"
+  },
+  {
+    "run_id": "repeat-2",
+    "iteration": 2,
+    "test_name": "integration_suite",
+    "result": "PASS",
+    "environment": "docker"
+  },
+  {
+    "run_id": "repeat-3",
+    "iteration": 3,
+    "test_name": "integration_suite",
+    "result": "PASS",
+    "environment": "docker"
+  },
+  {
+    "run_id": "repeat-4",
+    "iteration": 4,
+    "test_name": "integration_suite",
+    "result": "PASS",
+    "environment": "docker"
+  },
+  {
+    "run_id": "repeat-5",
+    "iteration": 5,
+    "test_name": "integration_suite",
+    "result": "PASS",
+    "environment": "docker"
+  }
+]

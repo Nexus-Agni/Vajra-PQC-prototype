@@ -1,0 +1,14 @@
+[
+  {
+    "test": "tls_no_cert",
+    "expected": "reject at TLS layer",
+    "actual": "connection closed",
+    "pass": true
+  },
+  {
+    "test": "tls_wrong_ca",
+    "expected": "reject at TLS layer",
+    "actual": "CERTIFICATE_VERIFY_FAILED",
+    "pass": true
+  }
+]
