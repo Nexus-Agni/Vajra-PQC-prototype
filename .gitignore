@@ -43,3 +43,11 @@ results/phase1/raw/
 results/phase1/logs/
 *.log
 pki/
+
+
+# Agentic Development
+AGENTS.md
+AGENT_MEMORY.md
+.scratch
+.agents 
+docs
