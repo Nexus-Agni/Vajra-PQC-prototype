@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-08-28T14:37:36.099585",
+  "environment": "mock",
+  "results": [
+    {
+      "test": "prometheus metrics exposed",
+      "status": "PASS"
+    }
+  ]
+}

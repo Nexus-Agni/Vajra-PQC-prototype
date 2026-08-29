@@ -60,7 +60,7 @@ async def run_tests():
     
     # 1. Setup server
     config = GatewayConfig()
-    config.listen_port = 8443
+    config.listen_port = 8444
     config.cert_path = f"{PKI_DIR}/gateway_nia/nia_gateway.crt"
     config.key_path = f"{PKI_DIR}/gateway_nia/nia_gateway.key"
     config.ca_trust_path = f"{PKI_DIR}/ca/root_ca.crt"
@@ -139,49 +139,49 @@ async def run_tests():
     
     # --- Tests ---
     logger.info("Running TLS Negative Test: No Client Cert")
-    resp, err = await connect_and_send(8443, None, None, f"{PKI_DIR}/ca/root_ca.crt", b"")
+    resp, err = await connect_and_send(8444, None, None, f"{PKI_DIR}/ca/root_ca.crt", b"")
     results.append({"test": "tls_no_cert", "err": err, "pass": err is not None or resp == b""})
     
     logger.info("Running Happy Path")
     payload = create_payload("tx-1", "RAW", "NIA", TlpMarking.GREEN, {"type": "bundle", "id": "1", "objects": []}, "RAW")
-    resp, err = await connect_and_send(8443, f"{PKI_DIR}/gateway_raw/raw_gateway.crt", f"{PKI_DIR}/gateway_raw/raw_gateway.key", f"{PKI_DIR}/ca/root_ca.crt", payload)
+    resp, err = await connect_and_send(8444, f"{PKI_DIR}/gateway_raw/raw_gateway.crt", f"{PKI_DIR}/gateway_raw/raw_gateway.key", f"{PKI_DIR}/ca/root_ca.crt", payload)
     mtype, reason = parse_response(resp)
     results.append({"test": "happy_path", "mtype": mtype, "reason": reason, "pass": mtype == "ACK"})
     
     logger.info("Running Identity Mismatch")
     # Using RAW TLS cert, but claiming sender is NIA
     payload = create_payload("tx-2", "NIA", "NIA", TlpMarking.GREEN, {"type": "bundle", "id": "1", "objects": []}, "NIA")
-    resp, err = await connect_and_send(8443, f"{PKI_DIR}/gateway_raw/raw_gateway.crt", f"{PKI_DIR}/gateway_raw/raw_gateway.key", f"{PKI_DIR}/ca/root_ca.crt", payload)
+    resp, err = await connect_and_send(8444, f"{PKI_DIR}/gateway_raw/raw_gateway.crt", f"{PKI_DIR}/gateway_raw/raw_gateway.key", f"{PKI_DIR}/ca/root_ca.crt", payload)
     mtype, reason = parse_response(resp)
     results.append({"test": "identity_mismatch", "mtype": mtype, "reason": reason, "pass": reason == NackReason.IDENTITY_MISMATCH.value})
 
     logger.info("Running Invalid Signature")
     payload = create_payload("tx-3", "RAW", "NIA", TlpMarking.GREEN, {"type": "bundle", "id": "1", "objects": []}, "RAW", alter_sig=True)
-    resp, err = await connect_and_send(8443, f"{PKI_DIR}/gateway_raw/raw_gateway.crt", f"{PKI_DIR}/gateway_raw/raw_gateway.key", f"{PKI_DIR}/ca/root_ca.crt", payload)
+    resp, err = await connect_and_send(8444, f"{PKI_DIR}/gateway_raw/raw_gateway.crt", f"{PKI_DIR}/gateway_raw/raw_gateway.key", f"{PKI_DIR}/ca/root_ca.crt", payload)
     mtype, reason = parse_response(resp)
     results.append({"test": "invalid_sig", "mtype": mtype, "reason": reason, "pass": reason == NackReason.SIG_INVALID.value})
 
     logger.info("Running Modified Compressed Payload")
     payload = create_payload("tx-4", "RAW", "NIA", TlpMarking.GREEN, {"type": "bundle", "id": "1", "objects": []}, "RAW", alter_compressed=True)
-    resp, err = await connect_and_send(8443, f"{PKI_DIR}/gateway_raw/raw_gateway.crt", f"{PKI_DIR}/gateway_raw/raw_gateway.key", f"{PKI_DIR}/ca/root_ca.crt", payload)
+    resp, err = await connect_and_send(8444, f"{PKI_DIR}/gateway_raw/raw_gateway.crt", f"{PKI_DIR}/gateway_raw/raw_gateway.key", f"{PKI_DIR}/ca/root_ca.crt", payload)
     mtype, reason = parse_response(resp)
     results.append({"test": "modified_compressed", "mtype": mtype, "reason": reason, "pass": reason == NackReason.SIG_INVALID.value})
 
     logger.info("Running Policy Denied")
     payload = create_payload("tx-5", "RAW", "NIA", TlpMarking.AMBER_STRICT, {"type": "bundle", "id": "1", "objects": []}, "RAW")
-    resp, err = await connect_and_send(8443, f"{PKI_DIR}/gateway_raw/raw_gateway.crt", f"{PKI_DIR}/gateway_raw/raw_gateway.key", f"{PKI_DIR}/ca/root_ca.crt", payload)
+    resp, err = await connect_and_send(8444, f"{PKI_DIR}/gateway_raw/raw_gateway.crt", f"{PKI_DIR}/gateway_raw/raw_gateway.key", f"{PKI_DIR}/ca/root_ca.crt", payload)
     mtype, reason = parse_response(resp)
     results.append({"test": "policy_denied", "mtype": mtype, "reason": reason, "pass": reason == NackReason.POLICY_DENIED.value})
 
     logger.info("Running Malformed STIX")
     payload = create_payload("tx-6", "RAW", "NIA", TlpMarking.GREEN, {"not_a_bundle": True}, "RAW")
-    resp, err = await connect_and_send(8443, f"{PKI_DIR}/gateway_raw/raw_gateway.crt", f"{PKI_DIR}/gateway_raw/raw_gateway.key", f"{PKI_DIR}/ca/root_ca.crt", payload)
+    resp, err = await connect_and_send(8444, f"{PKI_DIR}/gateway_raw/raw_gateway.crt", f"{PKI_DIR}/gateway_raw/raw_gateway.key", f"{PKI_DIR}/ca/root_ca.crt", payload)
     mtype, reason = parse_response(resp)
     results.append({"test": "malformed_stix", "mtype": mtype, "reason": reason, "pass": reason == NackReason.MALFORMED.value})
 
     logger.info("Running OpenCTI Mock Rejection")
     payload = create_payload("tx-7", "RAW", "NIA", TlpMarking.GREEN, {"type": "bundle", "id": "1", "objects": [], "REJECT_ME": True}, "RAW")
-    resp, err = await connect_and_send(8443, f"{PKI_DIR}/gateway_raw/raw_gateway.crt", f"{PKI_DIR}/gateway_raw/raw_gateway.key", f"{PKI_DIR}/ca/root_ca.crt", payload)
+    resp, err = await connect_and_send(8444, f"{PKI_DIR}/gateway_raw/raw_gateway.crt", f"{PKI_DIR}/gateway_raw/raw_gateway.key", f"{PKI_DIR}/ca/root_ca.crt", payload)
     mtype, reason = parse_response(resp)
     results.append({"test": "opencti_reject", "mtype": mtype, "reason": reason, "pass": reason == NackReason.INGEST_FAILED.value})
 

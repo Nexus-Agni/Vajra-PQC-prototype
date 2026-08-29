@@ -23,3 +23,35 @@ services:
     environment:
       - OPENCTI_API_TOKEN=synthetic-token-for-testing
 
+  gateway-a-test:
+    build:
+      context: .
+      dockerfile: docker/gateway_a_test/Dockerfile
+    volumes:
+      - ./pki:/app/pki
+      - ./results:/app/results
+      - ./gateway_a:/app/gateway_a
+      - ./tests/phase4:/app/tests/phase4
+    environment:
+      - PYTHONPATH=/app
+
+  gateway-a:
+    build:
+      context: .
+      dockerfile: docker/gateway_a/Dockerfile
+    volumes:
+      - ./pki:/app/pki
+      - ./results:/app/results
+      - ./gateway_a:/app/gateway_a
+    environment:
+      - PYTHONPATH=/app
+      - MISP_ZMQ_ENDPOINT=tcp://0.0.0.0:5556
+      - MISP_TAGS_FILTER=tlp:amber,tlp:green
+      - ML_DSA_PRIVATE_KEY_PATH=pki/gateway_raw/raw_gateway.key
+      - CERT_PATH=pki/gateway_raw/raw_gateway.crt
+      - KEY_PATH=pki/gateway_raw/raw_gateway.key
+      - CA_TRUST_PATH=pki/ca/root_ca.crt
+      - GATEWAY_B_HOST=gateway-b
+      - GATEWAY_B_PORT=8443
+    depends_on:
+      - gateway-b

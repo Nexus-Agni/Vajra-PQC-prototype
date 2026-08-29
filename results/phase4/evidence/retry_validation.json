@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-08-28T14:40:20.776913",
+  "environment": "mock",
+  "results": [
+    {
+      "test": "retry 200ms and 400ms verified",
+      "status": "PASS",
+      "details": "Total retry duration: 0.71s"
+    },
+    {
+      "test": "NACK never retries",
+      "status": "PASS"
+    }
+  ]
+}

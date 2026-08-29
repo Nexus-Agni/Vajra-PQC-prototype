@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-08-26T16:40:57.391659",
+  "environment": "mock",
+  "results": [
+    {
+      "test": "allow valid TLP and recipient",
+      "status": "PASS",
+      "details": "AMBER + NIA allowed"
+    },
+    {
+      "test": "deny boundary TLP",
+      "status": "PASS",
+      "details": "AMBER_STRICT + NIA denied"
+    },
+    {
+      "test": "unknown recipient",
+      "status": "PASS",
+      "details": "GREEN + UNKNOWN denied"
+    },
+    {
+      "test": "boundary TLP values (unknown)",
+      "status": "PASS",
+      "details": "tlp:red denied"
+    }
+  ]
+}

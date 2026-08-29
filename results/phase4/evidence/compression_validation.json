@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-08-26T16:39:06.760972",
+  "environment": "mock",
+  "results": [
+    {
+      "test": "compression characteristics",
+      "status": "PASS",
+      "details": "raw_payload_size: 361, compressed_payload_size: 88, compression_ratio: 4.10"
+    }
+  ]
+}

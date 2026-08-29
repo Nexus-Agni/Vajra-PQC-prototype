@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-08-26T16:39:06.761364",
+  "environment": "mock",
+  "results": [
+    {
+      "test": "sign valid payload and verify with correct public key",
+      "status": "PASS"
+    },
+    {
+      "test": "sign same payload repeatedly",
+      "status": "PASS"
+    },
+    {
+      "test": "modify payload -> verification fails",
+      "status": "PASS"
+    },
+    {
+      "test": "modify signature -> verification fails",
+      "status": "PASS"
+    },
+    {
+      "test": "verify with wrong public key -> verification fails",
+      "status": "PASS"
+    }
+  ]
+}

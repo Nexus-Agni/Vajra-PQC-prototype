@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-08-28T14:37:35.584014",
+  "environment": "mock",
+  "configured_maxlen": 500,
+  "items_before_overflow": 500,
+  "items_after_overflow": 500,
+  "oldest_evicted": true,
+  "newest_retained": true,
+  "status": "PASS",
+  "results": [
+    {
+      "test": "dead-letter store maxlen 500 boundary",
+      "status": "PASS",
+      "details": "Inserted 501 items. Deque maintained maxlen=500, oldest item tx_0 evicted, newest item tx_500 retained. JSONL append-only verified."
+    }
+  ]
+}
