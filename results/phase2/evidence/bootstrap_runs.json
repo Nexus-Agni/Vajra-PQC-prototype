@@ -1,24 +1,101 @@
 [
-    {
-        "run_id":  "run-1",
-        "timestamp":  "2026-08-20T17:54:24.206177+00:00",
-        "git_commit":  "1ed2505ab9fdcad2f43f3689de9f2fb7659e66c4",
-        "python_version":  "3.14.6",
-        "openssl_version":  "OpenSSL 3.5.7 9 Jun 2026",
-        "docker_image":  "docker.io/library/prototype-implementation-main-qstie-ca-bootstrap:latest",
-        "exit_status":  0,
-        "runtime_duration":  7.115082,
-        "validation_result":  "PASS"
-    },
-    {
-        "run_id":  "run-2",
-        "timestamp":  "2026-08-20T17:56:28.191114+00:00",
-        "git_commit":  "1ed2505ab9fdcad2f43f3689de9f2fb7659e66c4",
-        "python_version":  "3.14.6",
-        "openssl_version":  "OpenSSL 3.5.7 9 Jun 2026",
-        "docker_image":  "docker.io/library/prototype-implementation-main-qstie-ca-bootstrap:latest",
-        "exit_status":  0,
-        "runtime_duration":  3.016622,
-        "validation_result":  "PASS"
-    }
+  {
+    "run_id": "run-1",
+    "timestamp": "2026-08-20T17:54:24.206177+00:00",
+    "git_commit": "1ed2505ab9fdcad2f43f3689de9f2fb7659e66c4",
+    "python_version": "3.14.6",
+    "openssl_version": "OpenSSL 3.5.7 9 Jun 2026",
+    "docker_image": "docker.io/library/prototype-implementation-main-qstie-ca-bootstrap:latest",
+    "exit_status": 0,
+    "runtime_duration": 7.115082,
+    "validation_result": "PASS"
+  },
+  {
+    "run_id": "run-2",
+    "timestamp": "2026-08-20T17:56:28.191114+00:00",
+    "git_commit": "1ed2505ab9fdcad2f43f3689de9f2fb7659e66c4",
+    "python_version": "3.14.6",
+    "openssl_version": "OpenSSL 3.5.7 9 Jun 2026",
+    "docker_image": "docker.io/library/prototype-implementation-main-qstie-ca-bootstrap:latest",
+    "exit_status": 0,
+    "runtime_duration": 3.016622,
+    "validation_result": "PASS"
+  },
+  {
+    "run_id": "run-1",
+    "timestamp": "2026-08-29T14:18:50.953138+00:00",
+    "git_commit": "",
+    "python_version": "3.14.6",
+    "openssl_version": "OpenSSL 3.5.7 9 Jun 2026",
+    "docker_image": "",
+    "exit_status": 0,
+    "runtime_duration": 6.897847,
+    "validation_result": "PASS"
+  },
+  {
+    "run_id": "run-1",
+    "timestamp": "2026-08-29T14:20:04.824746+00:00",
+    "git_commit": "",
+    "python_version": "3.14.6",
+    "openssl_version": "OpenSSL 3.5.7 9 Jun 2026",
+    "docker_image": "",
+    "exit_status": 0,
+    "runtime_duration": 5.972047,
+    "validation_result": "PASS"
+  },
+  {
+    "run_id": "run-1",
+    "timestamp": "2026-08-29T14:21:04.399666+00:00",
+    "git_commit": "",
+    "python_version": "3.14.6",
+    "openssl_version": "OpenSSL 3.5.7 9 Jun 2026",
+    "docker_image": "",
+    "exit_status": 0,
+    "runtime_duration": 2.603126,
+    "validation_result": "PASS"
+  },
+  {
+    "run_id": "run-1",
+    "timestamp": "2026-08-29T14:27:52.442422+00:00",
+    "git_commit": "",
+    "python_version": "3.14.6",
+    "openssl_version": "OpenSSL 3.5.7 9 Jun 2026",
+    "docker_image": "",
+    "exit_status": 0,
+    "runtime_duration": 10.081956,
+    "validation_result": "PASS"
+  },
+  {
+    "run_id": "run-1",
+    "timestamp": "2026-08-29T14:31:02.475254+00:00",
+    "git_commit": "",
+    "python_version": "3.14.6",
+    "openssl_version": "OpenSSL 3.5.7 9 Jun 2026",
+    "docker_image": "",
+    "exit_status": 0,
+    "runtime_duration": 4.972063,
+    "validation_result": "PASS"
+  },
+  {
+    "run_id": "run-1",
+    "timestamp": "2026-08-29T15:05:30.071419+00:00",
+    "git_commit": "",
+    "python_version": "3.14.6",
+    "openssl_version": "OpenSSL 3.5.7 9 Jun 2026",
+    "docker_image": "",
+    "exit_status": 0,
+    "runtime_duration": 6.716809,
+    "validation_result": "PASS"
+  },
+  {
+    "run_id": "run-1",
+    "timestamp": "2026-08-29T15:06:54.054594+00:00",
+    "git_commit": "",
+    "python_version": "3.14.6",
+    "openssl_version": "OpenSSL 3.5.7 9 Jun 2026",
+    "docker_image": "",
+    "exit_status": 0,
+    "runtime_duration": 7.95089,
+    "validation_result": "PASS"
+  }
 ]

@@ -1,3 +1,17 @@
+networks:
+  agency_a_net:
+  tactical_a_net:
+    name: prototype-implementation-main_tactical_a_net
+    ipam:
+      config:
+        - subnet: 172.25.0.0/24
+  tactical_b_net:
+    name: prototype-implementation-main_tactical_b_net
+    ipam:
+      config:
+        - subnet: 172.26.0.0/24
+  agency_b_net:
+
 services:
   qstie-ca-bootstrap:
     build:
@@ -10,6 +24,131 @@ services:
     environment:
       - GIT_COMMIT=${GIT_COMMIT}
       - DOCKER_IMAGE_INFO=${DOCKER_IMAGE_INFO}
+    networks:
+      - agency_a_net
+      - agency_b_net
+
+  misp-db:
+    image: mysql:8
+    environment:
+      - MYSQL_DATABASE=misp
+      - MYSQL_USER=misp
+      - MYSQL_PASSWORD=misp
+      - MYSQL_ROOT_PASSWORD=misp
+    networks:
+      - agency_a_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  misp:
+    image: coolacid/misp-docker:core-latest
+    environment:
+      - MYSQL_HOST=misp-db
+      - MYSQL_DATABASE=misp
+      - MYSQL_USER=misp
+      - MYSQL_PASSWORD=misp
+      - DISIPV4=misp
+      - CRON_USER_ID=1
+    volumes:
+      - ./pki/gateway_raw/raw_gateway.crt:/etc/nginx/certs/cert.pem:ro
+      - ./pki/gateway_raw/raw_gateway.key:/etc/nginx/certs/key.pem:ro
+    depends_on:
+      misp-db:
+        condition: service_healthy
+    networks:
+      - agency_a_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-k", "https://localhost"]
+      interval: 20s
+      timeout: 10s
+      retries: 15
+
+  opencti-redis:
+    image: redis:7
+    networks:
+      - agency_b_net
+
+  opencti-elasticsearch:
+    image: elasticsearch:8.15.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
+    networks:
+      - agency_b_net
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"\\|\"status\":\"yellow\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  opencti-rabbitmq:
+    image: rabbitmq:3.13-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=opencti
+      - RABBITMQ_DEFAULT_PASS=opencti
+    networks:
+      - agency_b_net
+
+  opencti-minio:
+    image: minio/minio
+    command: server /data
+    environment:
+      - MINIO_ROOT_USER=opencti
+      - MINIO_ROOT_PASSWORD=opencti123
+    networks:
+      - agency_b_net
+
+  opencti:
+    image: opencti/platform:6.3.3
+    environment:
+      - APP__ADMIN__EMAIL=admin@opencti.io
+      - APP__ADMIN__PASSWORD=SuperSecretAdmin123!
+      - APP__ADMIN__TOKEN=bfa014e0-e010-4569-b020-000000000000
+      - APP__BASE_URL=http://localhost:8080
+      - APP__ENCRYPTION_KEY=00000000000000000000000000000000
+      - APP__PORT=8080
+      - REDIS__HOSTNAME=opencti-redis
+      - REDIS__PORT=6379
+      - ELASTICSEARCH__URL=http://opencti-elasticsearch:9200
+      - MINIO__ENDPOINT=opencti-minio
+      - MINIO__PORT=9000
+      - MINIO__USE_SSL=false
+      - MINIO__ACCESS_KEY=opencti
+      - MINIO__SECRET_KEY=opencti123
+      - RABBITMQ__HOSTNAME=opencti-rabbitmq
+      - RABBITMQ__PORT=5672
+      - RABBITMQ__USERNAME=opencti
+      - RABBITMQ__PASSWORD=opencti
+    depends_on:
+      opencti-redis:
+        condition: service_started
+      opencti-elasticsearch:
+        condition: service_healthy
+      opencti-minio:
+        condition: service_started
+      opencti-rabbitmq:
+        condition: service_started
+    networks:
+      - agency_b_net
+
+  netem-router:
+    build:
+      context: docker/netem_router
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv4.ip_forward=1
+    environment:
+      - PROFILE=stable
+    networks:
+      tactical_a_net:
+        ipv4_address: 172.25.0.254
+      tactical_b_net:
+        ipv4_address: 172.26.0.254
 
   gateway-b:
     build:
@@ -21,19 +160,21 @@ services:
       - ./gateway_b:/app/gateway_b
       - ./tests/phase3:/app/tests/phase3
     environment:
-      - OPENCTI_API_TOKEN=synthetic-token-for-testing
-
-  gateway-a-test:
-    build:
-      context: .
-      dockerfile: docker/gateway_a_test/Dockerfile
-    volumes:
-      - ./pki:/app/pki
-      - ./results:/app/results
-      - ./gateway_a:/app/gateway_a
-      - ./tests/phase4:/app/tests/phase4
-    environment:
-      - PYTHONPATH=/app
+      - OPENCTI_API_TOKEN=bfa014e0-e010-4569-b020-000000000000
+      - OPENCTI_URL=http://opencti:8080
+    networks:
+      agency_b_net:
+      tactical_b_net:
+        ipv4_address: 172.26.0.2
+    extra_hosts:
+      - "gateway-a:172.25.0.2"
+    cap_add:
+      - NET_ADMIN
+    entrypoint: >
+      bash -c "ip route add 172.25.0.0/24 via 172.26.0.254 && python -m gateway_b.main"
+    depends_on:
+      - opencti
+      - qstie-ca-bootstrap
 
   gateway-a:
     build:
@@ -45,7 +186,7 @@ services:
       - ./gateway_a:/app/gateway_a
     environment:
       - PYTHONPATH=/app
-      - MISP_ZMQ_ENDPOINT=tcp://0.0.0.0:5556
+      - MISP_ZMQ_ENDPOINT=tcp://misp:50000
       - MISP_TAGS_FILTER=tlp:amber,tlp:green
       - ML_DSA_PRIVATE_KEY_PATH=pki/gateway_raw/raw_gateway.key
       - CERT_PATH=pki/gateway_raw/raw_gateway.crt
@@ -53,5 +194,16 @@ services:
       - CA_TRUST_PATH=pki/ca/root_ca.crt
       - GATEWAY_B_HOST=gateway-b
       - GATEWAY_B_PORT=8443
+    networks:
+      agency_a_net:
+      tactical_a_net:
+        ipv4_address: 172.25.0.2
+    extra_hosts:
+      - "gateway-b:172.26.0.2"
+    cap_add:
+      - NET_ADMIN
+    entrypoint: >
+      bash -c "ip route add 172.26.0.0/24 via 172.25.0.254 && python -m gateway_a.main"
     depends_on:
-      - gateway-b
+      - misp
+      - qstie-ca-bootstrap
