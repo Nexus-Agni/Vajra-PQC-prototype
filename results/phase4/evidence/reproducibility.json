@@ -1,0 +1,54 @@
+{
+  "phase": "4",
+  "project": "VAJRA-PQC / QS-TIE",
+  "timestamp": "2026-08-28T14:41:00Z",
+  "environment": {
+    "os": "Linux (Docker)",
+    "python_version": "3.14.6",
+    "docker_version": "27.5.1",
+    "docker_compose_version": "Available via Docker 27.5.1",
+    "tls_library": "OpenSSL 3.5.7 with X25519MLKEM768 enabled via Phase 0 shims",
+    "cryptography": "cryptography python package matching Gateway B",
+    "stix_libs": ["misp-stix", "stix2"]
+  },
+  "git": {
+    "commit": "7cb84aa6c04af9fb570e0ce737c5a772468be884",
+    "branch": "NOT AVAILABLE",
+    "working_tree": "dirty"
+  },
+  "images": {
+    "gateway_a": {
+      "image_name": "prototype-implementation-main-gateway-a",
+      "tag": "latest",
+      "image_id": "sha256:7dc22beadf4c64ec1c095b1cbf78bdbc94a2ec287cb022bde1d1f2fd033e82e6",
+      "digest": "NOT AVAILABLE"
+    },
+    "gateway_b": {
+      "image_name": "prototype-implementation-main-gateway-b",
+      "tag": "latest",
+      "image_id": "sha256:36c698562577985b761fbbb975fb4e16aa37d8cc6bea4bc95442224d50b0ed79",
+      "digest": "NOT AVAILABLE"
+    }
+  },
+  "execution_instructions": {
+    "step_1": "docker compose build gateway-b gateway-a gateway-a-test",
+    "step_2": "docker compose up -d gateway-b",
+    "step_3": "docker compose run --rm -e GATEWAY_B_HOST=gateway-b -e GATEWAY_B_PORT=8443 gateway-a-test tests/phase4/test_4_12_15_integration.py -v -s",
+    "step_4": "Verify the results/phase4/evidence/*.json outputs",
+    "step_5": "docker compose down"
+  },
+  "evidence_manifest": [
+    "results/phase4/evidence/misp_validation.json",
+    "results/phase4/evidence/stix_validation.json",
+    "results/phase4/evidence/compression_validation.json",
+    "results/phase4/evidence/signing_validation.json",
+    "results/phase4/evidence/policy_validation.json",
+    "results/phase4/evidence/tls_client_validation.json",
+    "results/phase4/evidence/wire_protocol_validation.json",
+    "results/phase4/evidence/ack_nack_validation.json",
+    "results/phase4/evidence/retry_validation.json",
+    "results/phase4/evidence/deadletter_validation.json",
+    "results/phase4/evidence/metrics_validation.json",
+    "results/phase4/evidence/integration_validation.json"
+  ]
+}

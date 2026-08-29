@@ -1,0 +1,29 @@
+{
+  "timestamp": "2026-08-28T14:40:20.776913",
+  "environment": "mock",
+  "results": [
+    {
+      "test": "connection refused",
+      "status": "PASS"
+    },
+    {
+      "test": "wrong CA",
+      "status": "PASS",
+      "details": "Handshake failed, no application NACK expected"
+    },
+    {
+      "test": "wrong server certificate",
+      "status": "PASS",
+      "details": "Handshake failed, no application NACK expected"
+    },
+    {
+      "test": "TLS timeout",
+      "status": "PASS",
+      "details": "Handshake failed with timeout in 0.51s, no application NACK expected"
+    },
+    {
+      "test": "successful hybrid TLS handshake",
+      "status": "PASS"
+    }
+  ]
+}

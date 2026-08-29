@@ -1,0 +1,14 @@
+{
+  "timestamp": "2026-08-28T14:40:20.776913",
+  "environment": "mock",
+  "results": [
+    {
+      "test": "ACK handling",
+      "status": "PASS"
+    },
+    {
+      "test": "NACK handling",
+      "status": "PASS"
+    }
+  ]
+}

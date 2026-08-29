@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-08-26T16:35:23.259737",
+  "environment": "mock",
+  "results": [
+    {
+      "test": "valid MISP event",
+      "status": "PASS",
+      "details": "Generated valid STIX 2.1 bundle with 2756 bytes"
+    },
+    {
+      "test": "invalid conversion",
+      "status": "PASS",
+      "details": "Rejected before crypto, no transaction produced"
+    },
+    {
+      "test": "malformed/invalid STIX",
+      "status": "PASS",
+      "details": "Validation failed, rejected before signing"
+    }
+  ]
+}

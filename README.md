@@ -32,20 +32,27 @@ The prototype has been developed in strict, verifiable phases. The following mil
 - Integrated a `ThreadPoolExecutor` wrapper for synchronous OpenCTI ingestion routines to guarantee the responsiveness of the asynchronous event loop under concurrent load.
 - Achieved 100% pass rates across rigorous integration, failure injection, and manual security test matrices within an isolated Docker environment.
 
+### Phase 4: Gateway A (Sender) Implementation
+- Constructed an asynchronous pipeline responsible for ingesting MISP events via ZeroMQ, extracting payloads to STIX 2.1, compressing with zlib, and signing with ML-DSA-65.
+- Engineered an Outbound Policy Enforcement Point (PEP) to authorize intelligence dissemination based on strict TLP (Traffic Light Protocol) markings.
+- Established a PQC hybrid mTLS client (TLS 1.3 with X25519MLKEM768) that orchestrates secure delivery to Gateway B.
+- Implemented robust error handling including application-layer ACK/NACK processing, exponential backoff retries for network faults, and a persistent Dead-Letter Queue (bounded deque and JSONL auditing) for terminal failures.
+- Embedded a Prometheus HTTP metrics server to expose observability data (queue depths, failure counts, and reasons).
+- Successfully completed full, controlled end-to-end integration and rigorous negative testing against Gateway B in Docker, resolving all requirements traceability with zero evidence gaps.
+
 ## Key Results and Findings
 
 - **TLS-Layer Security Validation:** Client certificate rejections are successfully enforced at the TLS layer, guaranteeing that unauthorized connections consume zero application-layer resources.
 - **Fail-Closed Design:** The strict verify-before-decompress ordering proved highly effective. Modified or maliciously crafted compressed payloads are rejected cryptographically before resource-intensive decompression occurs.
 - **Identity Assurance:** Sender-ID spoofing scenarios within an established mTLS tunnel are actively neutralized by the identity cross-check mechanism.
-- **Concurrency Correctness:** By isolating synchronous operations (like OpenCTI ingestion mocks) within dedicated thread pools, the Gateway B receiver successfully maintains high concurrency without blocking the main event loop.
+- **Concurrency Correctness:** By isolating synchronous operations (like STIX conversion or OpenCTI ingestion mocks) within dedicated thread pools, both Gateways successfully maintain high concurrency without blocking the main event loop.
+- **Resilient Delivery:** Gateway A's pipeline architecture seamlessly handles backpressure, retries transient failures, and safely dead-letters terminally rejected transactions, maintaining strict pipeline stability.
 - **Validation Consistency:** The system consistently produces authoritative, machine-readable JSON evidence matrices validating exact behavior across TLS negative tests, protocol malformations, signature tampering, and policy denials.
 
 ## Future Work / Yet to Implement
 
-While the receiving infrastructure and cryptographic baselines are frozen and validated, the following components remain to be implemented in subsequent phases:
+While the core Gateway A/B architecture and cryptographic baselines are frozen and validated, the following components remain to be implemented in subsequent phases:
 
-- **Phase 4 (Gateway A - Sender):** Implementation of the outbound transmission gateway, responsible for packaging STIX intelligence, applying ML-DSA-65 signatures, compressing payloads, and establishing the outbound mTLS tunnel.
-- **Outbound Policy Enforcement (PEP):** Rule engines on the sender side to prevent unauthorized dissemination of sensitive intelligence based on predefined sharing agreements.
-- **Live Infrastructure Integration:** Transitioning from the current mock OpenCTI ingestion engine to live, authenticated interactions with active OpenCTI or MISP instances.
-- **Advanced Message Queuing:** Implementation of retry logic, dead-letter queues, and resilient transaction states for network disruptions.
+- **Phase 5 (Full System Integration):** Transitioning from the current mock ingestion and delivery mechanisms (ZMQ mocks and synthetic OpenCTI tokens) to live, authenticated interactions with active MISP and OpenCTI instances.
 - **Production Benchmarking:** Extensive performance evaluation and load testing to measure the latency, throughput, and computational overhead introduced by the post-quantum cryptographic primitives in a high-volume sharing environment.
+- **Advanced Orchestration:** Deployment configurations for Kubernetes or Swarm to evaluate scalability and high availability of the gateway services.

@@ -1,0 +1,36 @@
+{
+  "timestamp": "2026-08-26T15:31:36.815406",
+  "environment": "mock",
+  "results": [
+    {
+      "test": "event received",
+      "status": "PASS",
+      "details": "Valid event accepted"
+    },
+    {
+      "test": "event filtered",
+      "status": "PASS",
+      "details": "Valid event filtered based on tag"
+    },
+    {
+      "test": "event ignored",
+      "status": "PASS",
+      "details": "Invalid event dropped"
+    },
+    {
+      "test": "ZMQ disconnect",
+      "status": "PASS",
+      "details": "Disconnect detected"
+    },
+    {
+      "test": "ZMQ reconnect",
+      "status": "PASS",
+      "details": "Reconnected and received event"
+    },
+    {
+      "test": "slow consumer",
+      "status": "PASS",
+      "details": "Queue maxsize respected (backpressure)"
+    }
+  ]
+}
