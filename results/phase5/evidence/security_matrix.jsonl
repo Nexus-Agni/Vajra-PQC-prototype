@@ -1,0 +1,7 @@
+{"test": "policy_denial", "status": "PASS"}
+{"test": "no_client_cert", "status": "PASS", "output": {"status": "connection_closed_or_empty"}}
+{"test": "wrong_cert", "status": "PASS", "output": {"status": "connection_closed_or_empty"}}
+{"test": "forged_sender", "status": "PASS", "output": {"status": "received", "msg_type": "3", "body": {"transaction_id": "tx-man-1", "reason": "IDENTITY_MISMATCH"}}}
+{"test": "modified_sig", "status": "PASS", "output": {"status": "received", "msg_type": "3", "body": {"transaction_id": "tx-man-2", "reason": "SIG_INVALID"}}}
+{"test": "modified_compressed", "status": "PASS", "output": {"status": "received", "msg_type": "3", "body": {"transaction_id": "tx-man-3", "reason": "SIG_INVALID"}}}
+{"test": "malformed_stix", "status": "PASS", "output": {"status": "received", "msg_type": "3", "body": {"transaction_id": "tx-man-6", "reason": "MALFORMED"}}}
