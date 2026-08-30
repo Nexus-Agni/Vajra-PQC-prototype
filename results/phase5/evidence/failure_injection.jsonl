@@ -1,0 +1,2 @@
+{"test": "router_failure", "status": "PASS"}
+{"test": "opencti_unavailable", "status": "PASS"}

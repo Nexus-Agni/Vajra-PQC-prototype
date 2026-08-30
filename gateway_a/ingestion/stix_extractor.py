@@ -76,6 +76,21 @@ class StixExtractor:
             return None
             
         try:
+            # Extract basic info before conversion (since parser may modify dict in place)
+            misp_event_uuid = misp_event.get("Event", {}).get("uuid", "")
+            
+            tlp_marking = TlpMarking.AMBER
+            for tag in misp_event.get("Event", {}).get("Tag", []):
+                tag_name = tag.get("name", "").lower()
+                if tag_name == "tlp:clear" or tag_name == "tlp:white":
+                    tlp_marking = TlpMarking.GREEN
+                elif tag_name == "tlp:green":
+                    tlp_marking = TlpMarking.GREEN
+                elif tag_name == "tlp:amber":
+                    tlp_marking = TlpMarking.AMBER
+                elif tag_name == "tlp:amber+strict":
+                    tlp_marking = TlpMarking.AMBER_STRICT
+
             # 1. Convert to STIX 2.1
             parser = MISPtoSTIX21Parser()
             parser.parse_misp_event(misp_event)
@@ -92,21 +107,7 @@ class StixExtractor:
             # 2. Validate using stix2
             parsed_bundle = stix2_parse(stix_bundle_str)
             
-            # Extract basic info
             bundle_id = parsed_bundle.get("id", "bundle--unknown")
-            misp_event_uuid = misp_event.get("Event", {}).get("uuid", "")
-            
-            tlp_marking = TlpMarking.AMBER
-            for tag in misp_event.get("Event", {}).get("Tag", []):
-                tag_name = tag.get("name", "").lower()
-                if tag_name == "tlp:clear" or tag_name == "tlp:white":
-                    tlp_marking = TlpMarking.GREEN
-                elif tag_name == "tlp:green":
-                    tlp_marking = TlpMarking.GREEN
-                elif tag_name == "tlp:amber":
-                    tlp_marking = TlpMarking.AMBER
-                elif tag_name == "tlp:amber+strict":
-                    tlp_marking = TlpMarking.AMBER_STRICT
             
             return StixBundle(
                 bundle_id=bundle_id,

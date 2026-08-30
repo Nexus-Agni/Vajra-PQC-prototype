@@ -23,6 +23,7 @@ class PepWorker:
                 tlp = transaction.stix_bundle.tlp_marking
                 recipient_id = transaction.recipient_id
                 
+                logger.info(f"PEP Worker evaluating TLP {tlp} for {recipient_id}")
                 authorized, reason = self.pep.authorize(tlp, recipient_id)
                 
                 if authorized:

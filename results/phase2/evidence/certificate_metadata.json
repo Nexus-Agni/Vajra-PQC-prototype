@@ -5,12 +5,12 @@
     "subject": "CN=QS-TIE Root CA",
     "issuer": "CN=QS-TIE Root CA",
     "SAN": [],
-    "serial_number": "168864711698189922618786969809113163715658558014",
+    "serial_number": "196870167972235255745478581750675774639558659695",
     "signature_algorithm": "2.16.840.1.101.3.4.3.18",
     "public_key_algorithm": "ML-DSA-65",
-    "valid_from": "2026-08-29T15:06:54+00:00",
-    "valid_until": "2036-08-26T15:06:54+00:00",
-    "certificate_fingerprint": "a731c21c1d6881632249c0027b0b44e89f0063f21ead521c64f8b142d806ad55",
+    "valid_from": "2026-08-30T15:01:50+00:00",
+    "valid_until": "2036-08-27T15:01:50+00:00",
+    "certificate_fingerprint": "6273a92e20948220368c67a63db1d94248d495a4db9a842cb85dc04883e5bd54",
     "validation_result": "PASS"
   },
   {
@@ -21,12 +21,12 @@
     "SAN": [
       "gateway-a.internal"
     ],
-    "serial_number": "524529984610986198074824680654079157192301690810",
+    "serial_number": "720393850960591612790487392205666664626825326470",
     "signature_algorithm": "2.16.840.1.101.3.4.3.18",
     "public_key_algorithm": "ML-DSA-65",
-    "valid_from": "2026-08-29T15:06:54+00:00",
-    "valid_until": "2026-11-27T15:06:54+00:00",
-    "certificate_fingerprint": "817f69b510829ec13c384b7d10e01914d3428c52360f02af1ea93703e5effd2c",
+    "valid_from": "2026-08-30T15:01:50+00:00",
+    "valid_until": "2026-11-28T15:01:50+00:00",
+    "certificate_fingerprint": "51659a0f64bd18642b66c28ec6b9a75f07abca80dee75a830af396a21fccafcf",
     "validation_result": "PASS"
   },
   {
@@ -37,12 +37,12 @@
     "SAN": [
       "gateway-b.internal"
     ],
-    "serial_number": "525587190242422264792569856977043812394011487747",
+    "serial_number": "171649537252524286782819781899128809555065737401",
     "signature_algorithm": "2.16.840.1.101.3.4.3.18",
     "public_key_algorithm": "ML-DSA-65",
-    "valid_from": "2026-08-29T15:06:55+00:00",
-    "valid_until": "2026-11-27T15:06:55+00:00",
-    "certificate_fingerprint": "d1c2915fbdd80d8e7bdb85a036d5a2faa099ed2ffaa269852f3a641cc2233c7c",
+    "valid_from": "2026-08-30T15:01:51+00:00",
+    "valid_until": "2026-11-28T15:01:51+00:00",
+    "certificate_fingerprint": "ae8babc495ee0b0dbcfa176710b9d8ab5a4d8c2eeb94848b2450b1bd9d8f1e8a",
     "validation_result": "PASS"
   }
 ]

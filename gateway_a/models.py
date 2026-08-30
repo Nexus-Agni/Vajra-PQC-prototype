@@ -27,7 +27,7 @@ class StixBundle:
 class GatewayATransaction:
     transaction_id: UUID = field(default_factory=uuid4)
     sender_id: str = "RAW"
-    recipient_id: str = ""
+    recipient_id: str = "NIA"
     stix_bundle: Optional[StixBundle] = None
     signature: bytes = b""
     signer_cert_fingerprint: str = ""

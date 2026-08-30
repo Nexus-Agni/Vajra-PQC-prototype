@@ -52,9 +52,6 @@ services:
       - MYSQL_PASSWORD=misp
       - DISIPV4=misp
       - CRON_USER_ID=1
-    volumes:
-      - ./pki/gateway_raw/raw_gateway.crt:/etc/nginx/certs/cert.pem:ro
-      - ./pki/gateway_raw/raw_gateway.key:/etc/nginx/certs/key.pem:ro
     depends_on:
       misp-db:
         condition: service_healthy
@@ -187,8 +184,8 @@ services:
     environment:
       - PYTHONPATH=/app
       - MISP_ZMQ_ENDPOINT=tcp://misp:50000
-      - MISP_TAGS_FILTER=tlp:amber,tlp:green
-      - ML_DSA_PRIVATE_KEY_PATH=pki/gateway_raw/raw_gateway.key
+      - MISP_TAGS_FILTER=tlp:amber,tlp:green,tlp:amber+strict
+      - ML_DSA_PRIVATE_KEY_PATH=pki/gateway_raw/raw_ml_dsa65.pem
       - CERT_PATH=pki/gateway_raw/raw_gateway.crt
       - KEY_PATH=pki/gateway_raw/raw_gateway.key
       - CA_TRUST_PATH=pki/ca/root_ca.crt
