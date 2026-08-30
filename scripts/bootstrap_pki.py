@@ -49,12 +49,15 @@ def main():
     os.makedirs(pki_dir, exist_ok=True)
     os.makedirs(ev_dir, exist_ok=True)
     
-    run_cmd(["qstie-ca", "init-root", "--out-dir", f"{pki_dir}/ca", "--validity-days", "3650"])
-    run_cmd(["qstie-ca", "issue-gateway-cert", "--agency-id", "RAW", "--ca-dir", f"{pki_dir}/ca", "--san", "gateway-a.internal", "--out-dir", f"{pki_dir}/gateway_raw"])
-    run_cmd(["qstie-ca", "issue-gateway-cert", "--agency-id", "NIA", "--ca-dir", f"{pki_dir}/ca", "--san", "gateway-b.internal", "--out-dir", f"{pki_dir}/gateway_nia"])
-    run_cmd(["qstie-ca", "issue-signing-key", "--agency-id", "RAW", "--out-dir", f"{pki_dir}/gateway_raw"])
-    run_cmd(["qstie-ca", "issue-signing-key", "--agency-id", "NIA", "--out-dir", f"{pki_dir}/gateway_nia"])
-    run_cmd(["qstie-ca", "export-trust-bundle", "--agencies", "RAW,NIA", "--pki-root", pki_dir, "--out", f"{pki_dir}/trust_store.yaml"])
+    if not os.path.exists(f"{pki_dir}/trust_store.yaml"):
+        run_cmd(["qstie-ca", "init-root", "--out-dir", f"{pki_dir}/ca", "--validity-days", "3650"])
+        run_cmd(["qstie-ca", "issue-gateway-cert", "--agency-id", "RAW", "--ca-dir", f"{pki_dir}/ca", "--san", "gateway-a.internal", "--out-dir", f"{pki_dir}/gateway_raw"])
+        run_cmd(["qstie-ca", "issue-gateway-cert", "--agency-id", "NIA", "--ca-dir", f"{pki_dir}/ca", "--san", "gateway-b.internal", "--out-dir", f"{pki_dir}/gateway_nia"])
+        run_cmd(["qstie-ca", "issue-signing-key", "--agency-id", "RAW", "--out-dir", f"{pki_dir}/gateway_raw"])
+        run_cmd(["qstie-ca", "issue-signing-key", "--agency-id", "NIA", "--out-dir", f"{pki_dir}/gateway_nia"])
+        run_cmd(["qstie-ca", "export-trust-bundle", "--agencies", "RAW,NIA", "--pki-root", pki_dir, "--out", f"{pki_dir}/trust_store.yaml"])
+    else:
+        print("PKI already bootstrapped, skipping generation.")
     
     # Revocation with ACTUAL fingerprint
     cert_raw = load_cert(f"{pki_dir}/gateway_raw/raw_gateway.crt")

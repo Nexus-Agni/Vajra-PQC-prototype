@@ -171,8 +171,10 @@ services:
     entrypoint: >
       bash -c "ip route add 172.25.0.0/24 via 172.26.0.254 && python -m gateway_b.main"
     depends_on:
-      - opencti
-      - qstie-ca-bootstrap
+      opencti:
+        condition: service_started
+      qstie-ca-bootstrap:
+        condition: service_completed_successfully
 
   gateway-a:
     build:
@@ -204,8 +206,10 @@ services:
     entrypoint: >
       bash -c "ip route add 172.26.0.0/24 via 172.25.0.254 && python -m gateway_a.main"
     depends_on:
-      - misp
-      - qstie-ca-bootstrap
+      misp:
+        condition: service_started
+      qstie-ca-bootstrap:
+        condition: service_completed_successfully
 
   benchmark-runner:
     build:

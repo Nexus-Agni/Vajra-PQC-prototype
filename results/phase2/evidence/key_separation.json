@@ -1,14 +1,14 @@
 [
   {
     "agency": "RAW",
-    "tls_public_key_fingerprint": "b1ebba5d971ffad4b332c5a8d51f922df5a318f5790ae8ab1904e8443e9877be",
-    "payload_signing_public_key_fingerprint": "869d375d66295afe858667e715dd1f775f5087e2bae4016b93171ff8bf835816",
+    "tls_public_key_fingerprint": "95fdc56076f1bfc9921a2cacb1886d1e1baa5fd45e0312523f49a3701b27d192",
+    "payload_signing_public_key_fingerprint": "6ccd1f182a3a0e6f65f31cafc1d3ddf0f1933e9bdd8145217b980cd176cb7df9",
     "comparison_result": "different = PASS"
   },
   {
     "agency": "NIA",
-    "tls_public_key_fingerprint": "f4e692d795ca106b38cbc9cef7d0735a2bf97b90be868190d4ba7ae7735494f1",
-    "payload_signing_public_key_fingerprint": "dc76e242339478a80414d980ec560ad31aa81521a5532690a62e46b540347db8",
+    "tls_public_key_fingerprint": "795ba3dee3175e92f2da6cea43dedfbe59190e14e5a72b6679b67319bf2801a5",
+    "payload_signing_public_key_fingerprint": "1da74241ab35a8e76c25bb86b9cc475156ad92f1edf003829884e4fd4accfdc4",
     "comparison_result": "different = PASS"
   }
 ]
