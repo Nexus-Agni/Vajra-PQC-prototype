@@ -37,6 +37,8 @@ class MispZmqListener:
                     try:
                         event_data = json.loads(payload)
                         if self._is_relevant(event_data):
+                            import time
+                            event_data["_t_received"] = time.time_ns()
                             # Block if queue is full (backpressure)
                             await self.out_queue.put(event_data)
                             logger.debug("Enqueued relevant MISP event")

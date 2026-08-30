@@ -34,3 +34,4 @@ class GatewayATransaction:
     state: TransactionState = TransactionState.RECEIVED
     created_at: datetime = field(default_factory=datetime.utcnow)
     retry_count: int = 0
+    telemetry: dict = field(default_factory=dict)

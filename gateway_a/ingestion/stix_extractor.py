@@ -45,9 +45,15 @@ class StixExtractor:
                 )
                 
                 if bundle:
+                    import time
+                    telemetry = {
+                        "t_received": misp_event.get("_t_received", time.time_ns()),
+                        "t_extracted": time.time_ns()
+                    }
                     transaction = GatewayATransaction(
                         stix_bundle=bundle,
-                        state=TransactionState.VALIDATED
+                        state=TransactionState.VALIDATED,
+                        telemetry=telemetry
                     )
                     await self.out_queue.put(transaction)
                     logger.debug(f"Successfully extracted and enqueued transaction for MISP event: {bundle.misp_event_uuid}")

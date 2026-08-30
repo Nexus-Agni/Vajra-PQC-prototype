@@ -159,6 +159,7 @@ services:
     environment:
       - OPENCTI_API_TOKEN=bfa014e0-e010-4569-b020-000000000000
       - OPENCTI_URL=http://opencti:8080
+      - HYBRID_GROUP=${HYBRID_GROUP:-X25519MLKEM768}
     networks:
       agency_b_net:
       tactical_b_net:
@@ -191,6 +192,7 @@ services:
       - CA_TRUST_PATH=pki/ca/root_ca.crt
       - GATEWAY_B_HOST=gateway-b
       - GATEWAY_B_PORT=8443
+      - HYBRID_GROUP=${HYBRID_GROUP:-X25519MLKEM768}
     networks:
       agency_a_net:
       tactical_a_net:
@@ -204,3 +206,17 @@ services:
     depends_on:
       - misp
       - qstie-ca-bootstrap
+
+  benchmark-runner:
+    build:
+      context: .
+      dockerfile: docker/benchmark_runner/Dockerfile
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - PYTHONPATH=/app
+    depends_on:
+      - gateway-a
+      - gateway-b
+      - netem-router
