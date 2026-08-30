@@ -64,6 +64,11 @@ class TransmissionWorker:
             
             if success:
                 transaction.state = TransactionState.ACKED
+                import time
+                transaction.telemetry["t_acked"] = time.time_ns()
+                transaction.telemetry["retry_count"] = transaction.retry_count
+                from gateway_a.observability.telemetry_logger import log_telemetry
+                log_telemetry(transaction)
                 logger.info(f"Transaction {transaction.transaction_id} ACKED.")
                 return
             else:

@@ -94,6 +94,10 @@ class GatewayProtocol:
 
     async def process_transaction(self, writer: asyncio.StreamWriter, payload: bytes, peer_fingerprint: str):
         tx_id = "0"
+        import time
+        t_received = time.time_ns()
+        t_verified = 0
+        t_ingested = 0
         try:
             # 2. Protobuf decode
             try:
@@ -132,6 +136,8 @@ class GatewayProtocol:
             if not is_valid:
                 await self.send_nack(writer, tx_id, NackReason.SIG_INVALID)
                 return
+            
+            t_verified = time.time_ns()
 
             # 5. Inbound PEP
             pep_allow, _ = self.pep.evaluate(envelope.sender_id, envelope.recipient_id, envelope.tlp_marking.value)
@@ -162,8 +168,13 @@ class GatewayProtocol:
                 await self.send_nack(writer, tx_id, NackReason.INGEST_FAILED)
                 return
 
+            t_ingested = time.time_ns()
+
             # 9. ACK
             await self.send_ack(writer, tx_id)
+            
+            from gateway_b.observability.telemetry_logger import log_telemetry_b
+            log_telemetry_b(tx_id, t_received, t_verified, t_ingested, "ACKED")
             
         except Exception as e:
             traceback.print_exc()

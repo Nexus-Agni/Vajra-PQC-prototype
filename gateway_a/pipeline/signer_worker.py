@@ -51,6 +51,9 @@ class SignerWorker:
                 transaction.signer_cert_fingerprint = self.cert_fingerprint
                 transaction.state = TransactionState.SIGNED
                 
+                import time
+                transaction.telemetry["t_signed"] = time.time_ns()
+
                 await self.out_queue.put(transaction)
                 logger.debug(f"Successfully compressed and signed transaction {transaction.transaction_id}")
                 

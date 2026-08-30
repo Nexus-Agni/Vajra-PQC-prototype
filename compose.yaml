@@ -159,6 +159,11 @@ services:
     environment:
       - OPENCTI_API_TOKEN=bfa014e0-e010-4569-b020-000000000000
       - OPENCTI_URL=http://opencti:8080
+      - HYBRID_GROUP=${HYBRID_GROUP:-X25519MLKEM768}
+      - CERT_PATH=${B_CERT_PATH:-pki/gateway_nia/nia_gateway.crt}
+      - KEY_PATH=${B_KEY_PATH:-pki/gateway_nia/nia_gateway.key}
+      - CA_TRUST_PATH=${B_CA_TRUST_PATH:-pki/ca/root_ca.crt}
+      - TRUST_STORE_PATH=${TRUST_STORE_PATH:-pki/trust_store.yaml}
     networks:
       agency_b_net:
       tactical_b_net:
@@ -170,8 +175,10 @@ services:
     entrypoint: >
       bash -c "ip route add 172.25.0.0/24 via 172.26.0.254 && python -m gateway_b.main"
     depends_on:
-      - opencti
-      - qstie-ca-bootstrap
+      opencti:
+        condition: service_started
+      qstie-ca-bootstrap:
+        condition: service_completed_successfully
 
   gateway-a:
     build:
@@ -185,12 +192,13 @@ services:
       - PYTHONPATH=/app
       - MISP_ZMQ_ENDPOINT=tcp://misp:50000
       - MISP_TAGS_FILTER=tlp:amber,tlp:green,tlp:amber+strict
-      - ML_DSA_PRIVATE_KEY_PATH=pki/gateway_raw/raw_ml_dsa65.pem
-      - CERT_PATH=pki/gateway_raw/raw_gateway.crt
-      - KEY_PATH=pki/gateway_raw/raw_gateway.key
-      - CA_TRUST_PATH=pki/ca/root_ca.crt
+      - ML_DSA_PRIVATE_KEY_PATH=${A_PAYLOAD_KEY_PATH:-pki/gateway_raw/raw_ml_dsa65.pem}
+      - CERT_PATH=${A_CERT_PATH:-pki/gateway_raw/raw_gateway.crt}
+      - KEY_PATH=${A_KEY_PATH:-pki/gateway_raw/raw_gateway.key}
+      - CA_TRUST_PATH=${A_CA_TRUST_PATH:-pki/ca/root_ca.crt}
       - GATEWAY_B_HOST=gateway-b
       - GATEWAY_B_PORT=8443
+      - HYBRID_GROUP=${HYBRID_GROUP:-X25519MLKEM768}
     networks:
       agency_a_net:
       tactical_a_net:
@@ -202,5 +210,21 @@ services:
     entrypoint: >
       bash -c "ip route add 172.26.0.0/24 via 172.25.0.254 && python -m gateway_a.main"
     depends_on:
-      - misp
-      - qstie-ca-bootstrap
+      misp:
+        condition: service_started
+      qstie-ca-bootstrap:
+        condition: service_completed_successfully
+
+  benchmark-runner:
+    build:
+      context: .
+      dockerfile: docker/benchmark_runner/Dockerfile
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - PYTHONPATH=/app
+    depends_on:
+      - gateway-a
+      - gateway-b
+      - netem-router
