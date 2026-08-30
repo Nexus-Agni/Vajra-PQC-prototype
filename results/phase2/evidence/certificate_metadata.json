@@ -2,47 +2,47 @@
   {
     "agency_id": "root",
     "key_type": "root",
-    "subject": "CN=QS-TIE Root CA",
-    "issuer": "CN=QS-TIE Root CA",
+    "subject": "CN=QS-TIE Root CA (mldsa)",
+    "issuer": "CN=QS-TIE Root CA (mldsa)",
     "SAN": [],
-    "serial_number": "560763689802096902240690958035308155990791812057",
+    "serial_number": "54004278339088525127769296452719425642176926054",
     "signature_algorithm": "2.16.840.1.101.3.4.3.18",
     "public_key_algorithm": "ML-DSA-65",
-    "valid_from": "2026-08-30T15:16:37+00:00",
-    "valid_until": "2036-08-27T15:16:37+00:00",
-    "certificate_fingerprint": "95f6b584c582ea7f5c5f67ce8627ad4f8d70fe01b699431c16109a7167de3197",
+    "valid_from": "2026-08-30T16:21:38+00:00",
+    "valid_until": "2036-08-27T16:21:38+00:00",
+    "certificate_fingerprint": "bcf40c0a336ab4b461623cd2fa5b7dab4d1dc4b5802f1b925344db5b3e1e6707",
     "validation_result": "PASS"
   },
   {
     "agency_id": "RAW",
     "key_type": "tls_cert",
-    "subject": "O=RAW,CN=QS-TIE Gateway RAW",
-    "issuer": "CN=QS-TIE Root CA",
+    "subject": "O=RAW,CN=QS-TIE Gateway RAW (mldsa)",
+    "issuer": "CN=QS-TIE Root CA (mldsa)",
     "SAN": [
       "gateway-a.internal"
     ],
-    "serial_number": "604247725265934634951252466539252844441440913015",
+    "serial_number": "668339144085093917327714746946388037016046594328",
     "signature_algorithm": "2.16.840.1.101.3.4.3.18",
     "public_key_algorithm": "ML-DSA-65",
-    "valid_from": "2026-08-30T15:16:38+00:00",
-    "valid_until": "2026-11-28T15:16:38+00:00",
-    "certificate_fingerprint": "5423a734af2cdc7a0a7f87a98ec5944fdfafbdb666856038497663404deaa6f4",
+    "valid_from": "2026-08-30T16:21:39+00:00",
+    "valid_until": "2026-11-28T16:21:39+00:00",
+    "certificate_fingerprint": "843258b29e514bc308dc0f941cd47c8d77dc190bee931025aefe3cfb528286cd",
     "validation_result": "PASS"
   },
   {
     "agency_id": "NIA",
     "key_type": "tls_cert",
-    "subject": "O=NIA,CN=QS-TIE Gateway NIA",
-    "issuer": "CN=QS-TIE Root CA",
+    "subject": "O=NIA,CN=QS-TIE Gateway NIA (mldsa)",
+    "issuer": "CN=QS-TIE Root CA (mldsa)",
     "SAN": [
       "gateway-b.internal"
     ],
-    "serial_number": "355596871134196611587047378271767701175703511035",
+    "serial_number": "526696962728840861006918903619388590699504279712",
     "signature_algorithm": "2.16.840.1.101.3.4.3.18",
     "public_key_algorithm": "ML-DSA-65",
-    "valid_from": "2026-08-30T15:16:38+00:00",
-    "valid_until": "2026-11-28T15:16:38+00:00",
-    "certificate_fingerprint": "cc253a16e2e886e409f14002d95016b983051653fbe3c78475206717997b1538",
+    "valid_from": "2026-08-30T16:21:40+00:00",
+    "valid_until": "2026-11-28T16:21:40+00:00",
+    "certificate_fingerprint": "105edaf4a4cf700b9d99c1bbfcaf14e5f647a6c2461f4eb97d0dacde339941ad",
     "validation_result": "PASS"
   }
 ]

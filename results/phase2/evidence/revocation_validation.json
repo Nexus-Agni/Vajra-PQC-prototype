@@ -1,6 +1,6 @@
 [
   {
-    "fingerprint": "5423a734af2cdc7a0a7f87a98ec5944fdfafbdb666856038497663404deaa6f4",
+    "fingerprint": "843258b29e514bc308dc0f941cd47c8d77dc190bee931025aefe3cfb528286cd",
     "agency": "RAW",
     "key_type": "tls_cert",
     "reason": "suspected key compromise",
@@ -8,7 +8,7 @@
     "lookup_result": true
   },
   {
-    "fingerprint": "cc253a16e2e886e409f14002d95016b983051653fbe3c78475206717997b1538",
+    "fingerprint": "105edaf4a4cf700b9d99c1bbfcaf14e5f647a6c2461f4eb97d0dacde339941ad",
     "agency": "NIA",
     "key_type": "tls_cert",
     "reason": "N/A",

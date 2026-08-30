@@ -1,7 +1,8 @@
 import hashlib
 import logging
-import zlib
 from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.primitives import hashes
 
 logger = logging.getLogger(__name__)
 
@@ -18,22 +19,21 @@ class MlDsaSigner:
                     f.read(),
                     password=None
                 )
-            logger.info(f"Loaded ML-DSA-65 private key from {self.private_key_path}")
+            logger.info(f"Loaded private key from {self.private_key_path}")
         except Exception as e:
-            logger.error(f"Failed to load ML-DSA-65 private key: {e}")
+            logger.error(f"Failed to load private key: {e}")
             raise
 
     def sign(self, payload: bytes) -> bytes:
         if not self._private_key:
             raise RuntimeError("Private key not loaded")
             
-        # The protocol specifies: SHA-256(compressed_wire_payload) -> ML-DSA-65 sign
         digest = hashlib.sha256(payload).digest()
         
-        # cryptography's MLDSA verify takes the message directly if Prehashed is used, or the raw message. 
-        # Wait, the verifier in Gateway B does:
-        # digest = hashlib.sha256(compressed_payload).digest()
-        # pubkey.verify(signature, digest, None)
-        # Therefore, we MUST pass the digest as the 'message' to sign.
-        signature = self._private_key.sign(digest, None)
-        return signature
+        if isinstance(self._private_key, ec.EllipticCurvePrivateKey):
+            # Pass the raw payload because ECDSA will hash it, OR pass Prehashed
+            # Since gateway_b computes sha256 manually, we must use Prehashed
+            from cryptography.hazmat.primitives.asymmetric.utils import Prehashed
+            return self._private_key.sign(digest, ec.ECDSA(Prehashed(hashes.SHA256())))
+        else:
+            return self._private_key.sign(digest, None)

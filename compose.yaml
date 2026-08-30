@@ -160,6 +160,10 @@ services:
       - OPENCTI_API_TOKEN=bfa014e0-e010-4569-b020-000000000000
       - OPENCTI_URL=http://opencti:8080
       - HYBRID_GROUP=${HYBRID_GROUP:-X25519MLKEM768}
+      - CERT_PATH=${B_CERT_PATH:-pki/gateway_nia/nia_gateway.crt}
+      - KEY_PATH=${B_KEY_PATH:-pki/gateway_nia/nia_gateway.key}
+      - CA_TRUST_PATH=${B_CA_TRUST_PATH:-pki/ca/root_ca.crt}
+      - TRUST_STORE_PATH=${TRUST_STORE_PATH:-pki/trust_store.yaml}
     networks:
       agency_b_net:
       tactical_b_net:
@@ -188,10 +192,10 @@ services:
       - PYTHONPATH=/app
       - MISP_ZMQ_ENDPOINT=tcp://misp:50000
       - MISP_TAGS_FILTER=tlp:amber,tlp:green,tlp:amber+strict
-      - ML_DSA_PRIVATE_KEY_PATH=pki/gateway_raw/raw_ml_dsa65.pem
-      - CERT_PATH=pki/gateway_raw/raw_gateway.crt
-      - KEY_PATH=pki/gateway_raw/raw_gateway.key
-      - CA_TRUST_PATH=pki/ca/root_ca.crt
+      - ML_DSA_PRIVATE_KEY_PATH=${A_PAYLOAD_KEY_PATH:-pki/gateway_raw/raw_ml_dsa65.pem}
+      - CERT_PATH=${A_CERT_PATH:-pki/gateway_raw/raw_gateway.crt}
+      - KEY_PATH=${A_KEY_PATH:-pki/gateway_raw/raw_gateway.key}
+      - CA_TRUST_PATH=${A_CA_TRUST_PATH:-pki/ca/root_ca.crt}
       - GATEWAY_B_HOST=gateway-b
       - GATEWAY_B_PORT=8443
       - HYBRID_GROUP=${HYBRID_GROUP:-X25519MLKEM768}

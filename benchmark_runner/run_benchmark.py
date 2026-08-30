@@ -16,7 +16,7 @@ def run_cmd(cmd):
     return (result.stdout + "\n" + result.stderr).strip()
 
 def get_container_name(service_name):
-    cmd = f"docker ps --filter name={service_name} --format '{{{{.Names}}}}' | head -n 1"
+    cmd = f"docker ps --filter label=com.docker.compose.project=prototype-implementation-main --filter label=com.docker.compose.service={service_name} --format '{{{{.Names}}}}' | head -n 1"
     res = run_cmd(cmd)
     if not res:
         print(f"Warning: Could not find container for {service_name}")
@@ -48,21 +48,39 @@ def run_ping():
     return avg
 
 def inject_events(count):
-    misp = get_container_name("misp-1")
-    if not misp or misp == "misp-1":
-        misp = get_container_name("misp")
+    misp = get_container_name("misp")
     run_cmd(f"docker exec {misp} python3 /tmp/misp_publisher_mock.py {count} green")
 
 def main():
     print("Starting Benchmark...")
 def main():
-    print("Starting Benchmark...")
     results = []
 
     for crypto in ["X25519", "X25519MLKEM768"]:
         print(f"Setting crypto to {crypto}...")
         os.environ["HYBRID_GROUP"] = crypto
-        run_cmd("docker compose -f /app/compose.yaml up -d --force-recreate gateway-a gateway-b")
+        if crypto == "X25519":
+            # Classical baseline uses ECDSA PKI
+            os.environ["A_CERT_PATH"] = "pki/gateway_raw/raw_gateway_ecdsa.crt"
+            os.environ["A_KEY_PATH"] = "pki/gateway_raw/raw_gateway_ecdsa.key"
+            os.environ["A_PAYLOAD_KEY_PATH"] = "pki/gateway_raw/raw_ecdsa256.pem"
+            os.environ["A_CA_TRUST_PATH"] = "pki/ca_ecdsa/root_ca.crt"
+            os.environ["B_CERT_PATH"] = "pki/gateway_nia/nia_gateway_ecdsa.crt"
+            os.environ["B_KEY_PATH"] = "pki/gateway_nia/nia_gateway_ecdsa.key"
+            os.environ["B_CA_TRUST_PATH"] = "pki/ca_ecdsa/root_ca.crt"
+            os.environ["TRUST_STORE_PATH"] = "pki/trust_store_classical.yaml"
+        else:
+            # Hybrid uses ML-DSA PKI
+            os.environ["A_CERT_PATH"] = "pki/gateway_raw/raw_gateway.crt"
+            os.environ["A_KEY_PATH"] = "pki/gateway_raw/raw_gateway.key"
+            os.environ["A_PAYLOAD_KEY_PATH"] = "pki/gateway_raw/raw_ml_dsa65.pem"
+            os.environ["A_CA_TRUST_PATH"] = "pki/ca/root_ca.crt"
+            os.environ["B_CERT_PATH"] = "pki/gateway_nia/nia_gateway.crt"
+            os.environ["B_KEY_PATH"] = "pki/gateway_nia/nia_gateway.key"
+            os.environ["B_CA_TRUST_PATH"] = "pki/ca/root_ca.crt"
+            os.environ["TRUST_STORE_PATH"] = "pki/trust_store.yaml"
+            
+        run_cmd("docker compose -f /app/compose.yaml up -d gateway-a gateway-b")
         time.sleep(10)
     
         for profile in ["stable", "adverse"]:
@@ -103,8 +121,8 @@ def main():
                             pass
             
             # Process and align by transaction_id
-            df_a = pd.DataFrame([{"tx_id": e["transaction_id"], **e["telemetry"]} for e in a_events if e["state"] == "ACKED"])
-            df_b = pd.DataFrame([{"tx_id": e["transaction_id"], **e["telemetry"]} for e in b_events if e["state"] == "ACKED"])
+            df_a = pd.DataFrame([{"tx_id": e["transaction_id"], **e["telemetry"]} for e in a_events if e.get("state", "").upper() == "ACKED"])
+            df_b = pd.DataFrame([{"tx_id": e["transaction_id"], **e["telemetry"]} for e in b_events if e.get("state", "").upper() == "ACKED"])
             
             if len(df_a) == 0 or len(df_b) == 0:
                 print(f"No completed transactions for {profile} ({crypto})")

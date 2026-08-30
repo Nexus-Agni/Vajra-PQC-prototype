@@ -50,12 +50,21 @@ def main():
     os.makedirs(ev_dir, exist_ok=True)
     
     if not os.path.exists(f"{pki_dir}/trust_store.yaml"):
-        run_cmd(["qstie-ca", "init-root", "--out-dir", f"{pki_dir}/ca", "--validity-days", "3650"])
-        run_cmd(["qstie-ca", "issue-gateway-cert", "--agency-id", "RAW", "--ca-dir", f"{pki_dir}/ca", "--san", "gateway-a.internal", "--out-dir", f"{pki_dir}/gateway_raw"])
-        run_cmd(["qstie-ca", "issue-gateway-cert", "--agency-id", "NIA", "--ca-dir", f"{pki_dir}/ca", "--san", "gateway-b.internal", "--out-dir", f"{pki_dir}/gateway_nia"])
-        run_cmd(["qstie-ca", "issue-signing-key", "--agency-id", "RAW", "--out-dir", f"{pki_dir}/gateway_raw"])
-        run_cmd(["qstie-ca", "issue-signing-key", "--agency-id", "NIA", "--out-dir", f"{pki_dir}/gateway_nia"])
-        run_cmd(["qstie-ca", "export-trust-bundle", "--agencies", "RAW,NIA", "--pki-root", pki_dir, "--out", f"{pki_dir}/trust_store.yaml"])
+        # Generate PQC PKI
+        run_cmd(["qstie-ca", "init-root", "--out-dir", f"{pki_dir}/ca", "--validity-days", "3650", "--key-type", "mldsa"])
+        run_cmd(["qstie-ca", "issue-gateway-cert", "--agency-id", "RAW", "--ca-dir", f"{pki_dir}/ca", "--san", "gateway-a.internal", "--out-dir", f"{pki_dir}/gateway_raw", "--key-type", "mldsa"])
+        run_cmd(["qstie-ca", "issue-gateway-cert", "--agency-id", "NIA", "--ca-dir", f"{pki_dir}/ca", "--san", "gateway-b.internal", "--out-dir", f"{pki_dir}/gateway_nia", "--key-type", "mldsa"])
+        run_cmd(["qstie-ca", "issue-signing-key", "--agency-id", "RAW", "--out-dir", f"{pki_dir}/gateway_raw", "--key-type", "mldsa"])
+        run_cmd(["qstie-ca", "issue-signing-key", "--agency-id", "NIA", "--out-dir", f"{pki_dir}/gateway_nia", "--key-type", "mldsa"])
+        run_cmd(["qstie-ca", "export-trust-bundle", "--agencies", "RAW,NIA", "--pki-root", pki_dir, "--out", f"{pki_dir}/trust_store.yaml", "--key-type", "mldsa"])
+        
+        # Generate ECDSA PKI
+        run_cmd(["qstie-ca", "init-root", "--out-dir", f"{pki_dir}/ca_ecdsa", "--validity-days", "3650", "--key-type", "ecdsa"])
+        run_cmd(["qstie-ca", "issue-gateway-cert", "--agency-id", "RAW", "--ca-dir", f"{pki_dir}/ca_ecdsa", "--san", "gateway-a.internal", "--out-dir", f"{pki_dir}/gateway_raw", "--key-type", "ecdsa"])
+        run_cmd(["qstie-ca", "issue-gateway-cert", "--agency-id", "NIA", "--ca-dir", f"{pki_dir}/ca_ecdsa", "--san", "gateway-b.internal", "--out-dir", f"{pki_dir}/gateway_nia", "--key-type", "ecdsa"])
+        run_cmd(["qstie-ca", "issue-signing-key", "--agency-id", "RAW", "--out-dir", f"{pki_dir}/gateway_raw", "--key-type", "ecdsa"])
+        run_cmd(["qstie-ca", "issue-signing-key", "--agency-id", "NIA", "--out-dir", f"{pki_dir}/gateway_nia", "--key-type", "ecdsa"])
+        run_cmd(["qstie-ca", "export-trust-bundle", "--agencies", "RAW,NIA", "--pki-root", pki_dir, "--out", f"{pki_dir}/trust_store_classical.yaml", "--key-type", "ecdsa"])
     else:
         print("PKI already bootstrapped, skipping generation.")
     
