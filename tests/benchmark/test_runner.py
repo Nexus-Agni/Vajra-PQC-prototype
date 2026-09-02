@@ -72,7 +72,7 @@ def runner_env(tmp_path):
         """Simulate external commands. When 'misp_publisher_mock' is called,
         write fresh telemetry files to simulate gateway processing."""
         if "misp_publisher_mock" in cmd:
-            _write_telemetry_files(a_path, b_path, count=10)
+            _write_telemetry_files(a_path, b_path, count=150)
         return "rtt min/avg/max/mdev = 0.1/0.2/0.3/0.05 ms"
 
     runner = BenchmarkRunner(
@@ -80,7 +80,7 @@ def runner_env(tmp_path):
         telemetry_a_path=a_path,
         telemetry_b_path=b_path,
         exec_fn=mock_exec,
-        event_count=10,
+        event_count=150,
         wait_seconds=0,  # No waiting in tests
     )
     return runner, evidence_dir, mock_exec
@@ -103,7 +103,7 @@ class TestBenchmarkRunnerRun:
         runner, evidence_dir, _ = runner_env
         runner.run()
 
-        chart_path = evidence_dir / "latency_summary.png"
+        chart_path = evidence_dir / "boxplot_latency_comparison.png"
         assert chart_path.exists()
 
     def test_iterates_over_both_crypto_groups(self, runner_env):
@@ -132,7 +132,7 @@ class TestBenchmarkRunnerRun:
         assert "stable" in profiles
         assert "adverse" in profiles
 
-    def test_records_actual_rtt_in_results(self, runner_env):
+    def test_records_iteration_in_results(self, runner_env):
         runner, evidence_dir, _ = runner_env
         runner.run()
 
@@ -141,14 +141,14 @@ class TestBenchmarkRunnerRun:
         with open(csv_path, "r") as f:
             rows = list(csv_mod.DictReader(f))
 
-        for row in rows:
-            assert float(row["avg_rtt_ms"]) >= 0.0
+        iterations = {int(r["iteration"]) for r in rows}
+        assert iterations == {1, 2, 3, 4, 5}
 
-    def test_returns_four_results_for_two_crypto_two_profiles(self, runner_env):
+    def test_returns_twenty_results_for_five_iterations(self, runner_env):
         runner, _, _ = runner_env
         results = runner.run()
 
-        assert len(results) == 4
+        assert len(results) == 20
         combos = {(r["crypto"], r["profile"]) for r in results}
         assert ("X25519", "stable") in combos
         assert ("X25519", "adverse") in combos

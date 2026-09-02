@@ -41,12 +41,12 @@ class ReportGenerator:
 
         df = pd.DataFrame(results)
         
-        # Order columns as requested
         expected_columns = [
             "crypto", "profile", "iteration", "count", 
             "median_latency_ms", "mean_latency_ms", "std_dev_ms", 
             "ci_95_lower", "ci_95_upper", "p95_latency_ms", 
-            "p99_latency_ms", "p999_latency_ms", "mean_retries"
+            "p99_latency_ms", "p999_latency_ms", "mean_retries",
+            "avg_rtt_ms"
         ]
         
         # Add any missing columns just in case
@@ -89,10 +89,11 @@ class ReportGenerator:
         fig, ax = plt.subplots(figsize=(10, 6))
         
         # df has 'latency_ms' and 'label'
-        labels = df["label"].unique()
+        labels = df["label"].unique().tolist()
         data_to_plot = [df[df["label"] == label]["latency_ms"].dropna() for label in labels]
         
-        ax.boxplot(data_to_plot, labels=labels, whis=[5, 95], sym='.')
+        ax.boxplot(data_to_plot, whis=(5.0, 95.0), sym='.')  # type: ignore
+        ax.set_xticklabels(labels)
         
         ax.set_title("End-to-End Latency Distribution by Configuration")
         ax.set_ylabel("Latency (ms)")
@@ -107,10 +108,10 @@ class ReportGenerator:
     @staticmethod
     def _plot_cdfs(df: pd.DataFrame, output_dir: str) -> None:
         """Generate individual and combined CDF plots."""
-        labels = df["label"].unique()
+        labels = df["label"].unique().tolist()
         
         # Consistent color scheme and line styles
-        colors = plt.cm.tab10.colors
+        colors = plt.get_cmap("tab10").colors  # type: ignore
         line_styles = ['-', '--', '-.', ':']
         
         # 1. Individual CDFs
@@ -127,7 +128,7 @@ class ReportGenerator:
             ax.set_xlabel("End-to-End Latency (ms)")
             ax.set_ylabel("CDF")
             ax.grid(True, linestyle='--', alpha=0.7)
-            ax.set_ylim([0, 1.05])
+            ax.set_ylim((0.0, 1.05))
             fig.tight_layout()
             
             chart_path = os.path.join(output_dir, f"cdf_{label}.png")
@@ -148,7 +149,7 @@ class ReportGenerator:
         ax.set_ylabel("CDF")
         ax.grid(True, linestyle='--', alpha=0.7)
         ax.legend(loc="lower right")
-        ax.set_ylim([0, 1.05])
+        ax.set_ylim((0.0, 1.05))
         fig.tight_layout()
         
         chart_path = os.path.join(output_dir, "cdf_overlay.png")
