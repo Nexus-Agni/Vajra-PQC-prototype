@@ -92,7 +92,7 @@ class ReportGenerator:
         labels = df["label"].unique()
         data_to_plot = [df[df["label"] == label]["latency_ms"].dropna() for label in labels]
         
-        ax.boxplot(data_to_plot, labels=labels, whis=[5, 95], showmeans=True, meanline=True, sym='.')
+        ax.boxplot(data_to_plot, labels=labels, whis=[5, 95], sym='.')
         
         ax.set_title("End-to-End Latency Distribution by Configuration")
         ax.set_ylabel("Latency (ms)")

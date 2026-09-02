@@ -15,7 +15,7 @@ iptables -P FORWARD ACCEPT
 if [ "$PROFILE" = "adverse" ]; then
     echo "Applying adverse network conditions..."
     for dev in eth0 eth1; do
-        tc qdisc add dev $dev root netem delay 50ms 10ms loss 3% rate 5mbit || true
+        tc qdisc add dev $dev root netem delay 100ms 20ms loss 3% rate 5mbit || true
     done
 else
     echo "Applying stable network conditions (no tc rules)."
