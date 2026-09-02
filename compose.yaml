@@ -179,6 +179,11 @@ services:
         condition: service_started
       qstie-ca-bootstrap:
         condition: service_completed_successfully
+    deploy: &gateway-deploy
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
 
   gateway-a:
     build:
@@ -214,6 +219,7 @@ services:
         condition: service_started
       qstie-ca-bootstrap:
         condition: service_completed_successfully
+    deploy: *gateway-deploy
 
   benchmark-runner:
     build:
@@ -224,6 +230,13 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - PYTHONPATH=/app
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - agency_a_net
+      - tactical_a_net
+      - tactical_b_net
+      - agency_b_net
     depends_on:
       - gateway-a
       - gateway-b

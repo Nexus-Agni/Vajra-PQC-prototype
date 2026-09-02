@@ -14,10 +14,9 @@ iptables -P FORWARD ACCEPT
 # If the environment variable PROFILE=adverse, we apply netem delays.
 if [ "$PROFILE" = "adverse" ]; then
     echo "Applying adverse network conditions..."
-    # Apply to eth0 (towards tactical_a_net)
-    tc qdisc add dev eth0 root netem delay 50ms 10ms loss 5% || true
-    # Apply to eth1 (towards tactical_b_net)
-    tc qdisc add dev eth1 root netem delay 50ms 10ms loss 5% || true
+    for dev in eth0 eth1; do
+        tc qdisc add dev $dev root netem delay 50ms 10ms loss 3% rate 5mbit || true
+    done
 else
     echo "Applying stable network conditions (no tc rules)."
 fi
