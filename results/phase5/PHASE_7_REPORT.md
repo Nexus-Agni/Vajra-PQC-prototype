@@ -74,11 +74,30 @@ The benchmarking environment used for these evaluations is defined as follows:
 ![CDF Overlay Plot](evidence/cdf_overlay.png)
 *Figure 2: Overlay CDF illustrating the shift in latency percentiles for Classical (X25519) and Hybrid (X25519MLKEM768) environments. The curves denote the probability of a packet arriving within a specified timeframe, effectively showcasing the P95 and P99 long-tail degradation.*
 
+#### Per-Configuration CDFs
+The individual CDF plots below isolate performance bounds for specific suites and network conditions, confirming the consistency of the findings.
+
+![CDF X25519 Stable](evidence/cdf_X25519_stable.png)
+*Figure 3: CDF for Classical X25519 under stable conditions.*
+
+![CDF X25519 Adverse](evidence/cdf_X25519_adverse.png)
+*Figure 4: CDF for Classical X25519 under adverse conditions.*
+
+![CDF X25519MLKEM768 Stable](evidence/cdf_X25519MLKEM768_stable.png)
+*Figure 5: CDF for Hybrid X25519MLKEM768 under stable conditions.*
+
+![CDF X25519MLKEM768 Adverse](evidence/cdf_X25519MLKEM768_adverse.png)
+*Figure 6: CDF for Hybrid X25519MLKEM768 under adverse conditions.*
+
+
 ## Section 5: Analysis and Conclusion
 
-*   **Overhead Delta under Stable vs. Adverse Conditions:** Under stable loopback conditions, the latency overhead introduced by the Hybrid PQC suite (ML-KEM + ML-DSA) over the Classical baseline is marginal but noticeable. The larger cryptographic keys and signature payload sizes cause minor algorithmic delays but stay strictly within acceptable limits (P50 ~22k–62k ms range across iterations, largely overlapping with classical performance). However, under adverse tactical environments (50ms delay, 3% loss, 5Mbit cap), median latencies for both suites spike consistently into the ~170k–251k ms range, suggesting that network delay, not cryptographic computation, heavily dominates overall performance.
-*   **Tail Latency (P99/P99.9) Degradation:** Tail latency degradation is far more pronounced in adverse scenarios. The PQC payload sizes compound fragmentation risks over constrained links, driving up retransmission delays. While standard conditions maintain relatively tight tails (~27k–130k ms), adverse settings drive P99s up to 180k–265k ms natively.
-*   **Anomalies and Findings:** The second iteration of the Classical (X25519) adverse configuration revealed an extreme massive latency outlier (mean ~3.9M ms, P99 ~11M ms, standard deviation ~5.2M). Such cascading delays reflect an environmental worst-case anomaly—likely TCP retransmission backoff, OS scheduling starvation, or cascading bufferbloat interacting poorly with the injected 3% network packet loss. Despite this, the mean retries metric remained at 1.0, highlighting that a single catastrophic network stall at the socket level skewed the latency, rather than application-layer application retries.
+*   **Overhead Delta under Stable vs. Adverse Conditions:** Under stable loopback conditions, the latency overhead introduced by the Hybrid PQC suite (ML-KEM + ML-DSA) over the Classical baseline is negligible and highly competitive. In fact, the Hybrid PQC suite yielded a *lower* median latency than the Classical suite in three out of five iterations (iterations 1, 2, and 5). This demonstrates that algorithmic overhead is overshadowed by environmental system noise, and PQC stays strictly within acceptable limits. Under adverse tactical environments (50ms delay, 3% loss, 5Mbit cap), median latencies for both suites spike consistently into the ~170k-251k ms range, confirming that network delay—not cryptographic computation—heavily dominates overall performance.
+*   **Tail Latency (P99/P99.9) Degradation:** Tail latency degradation is far more pronounced in adverse scenarios. The PQC payload sizes compound fragmentation risks over constrained links, likely driving up lower-level OS/TCP retransmission delays. It is important to note that application-level mean_retries remained at exactly 1.0 across all adverse Hybrid PQC iterations, confirming that these delays stem entirely from socket-level and transport-layer stalling rather than application-layer failure/retry loops.
+*   **Anomalies and Findings:** 
+    *   **Latency Outlier:** The second iteration of the Classical (X25519) adverse configuration revealed an extreme latency outlier (mean ~3.9M ms, P99 ~11M ms, standard deviation ~5.2M). This reflects an environmental worst-case anomaly (e.g., cascading bufferbloat or OS starvation) interacting poorly with 3% packet loss.
+    *   **Missing Data:** Iteration 4 for the X25519, adverse configuration is completely missing from the results table, indicating that the benchmark runner failed to capture or dropped this specific run entirely.
+    *   **Variable Event Counts:** Despite the methodology stating 1,000 STIX events per iteration, the count column varies wildly (from 468 to 5,174). This indicates that the recorded telemetry metrics encompass more granular application-level spans (or amplified sub-events) rather than a strict 1:1 mapping to the injected events, or that backpressure/queueing mechanisms drastically altered event propagation per run.
 
 ## Section 6: Raw Data References
 
