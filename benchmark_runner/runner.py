@@ -46,8 +46,9 @@ class BenchmarkRunner:
         telemetry_a_path: Optional[str] = None,
         telemetry_b_path: Optional[str] = None,
         exec_fn: ExecFn = _default_exec,
-        event_count: int = 1000,
-        wait_seconds: int = 30,
+        event_count: int = 5000,
+        wait_seconds: int = 900,
+        warm_up_discard: int = 1000,
         compose_file: str = "/app/compose.yaml",
     ) -> None:
         self._evidence_dir = evidence_dir
@@ -59,6 +60,7 @@ class BenchmarkRunner:
         )
         self._exec = exec_fn
         self._event_count = event_count
+        self._warm_up_discard = warm_up_discard
         self._wait_seconds = wait_seconds
         self._compose_file = compose_file
 
@@ -200,7 +202,7 @@ class BenchmarkRunner:
             )
             return None
 
-        metrics = self._calc.compute(df)
+        metrics = self._calc.compute(df, warm_up_discard=self._warm_up_discard)
         if metrics is None:
             return None
 
@@ -209,12 +211,13 @@ class BenchmarkRunner:
         metrics["avg_rtt_ms"] = avg_rtt
         return metrics
 
-    def _get_latency_series(self, warm_up_discard: int = 100) -> Optional[pd.Series]:
+    def _get_latency_series(self, warm_up_discard: Optional[int] = None) -> Optional[pd.Series]:
         """Get the raw latency series for the current combination."""
         collector = TelemetryCollector(self._telemetry_a, self._telemetry_b)
         df = collector.collect()
-        if df.empty or len(df) <= warm_up_discard:
+        discard = warm_up_discard if warm_up_discard is not None else self._warm_up_discard
+        if df.empty or len(df) <= discard:
             return None
         
-        df = df.iloc[warm_up_discard:].copy()
+        df = df.iloc[discard:].copy()
         return (df["t_ingested_b"] - df["t_received"]) / 1e6

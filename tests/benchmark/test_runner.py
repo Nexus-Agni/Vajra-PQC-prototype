@@ -81,7 +81,8 @@ def runner_env(tmp_path):
         telemetry_b_path=b_path,
         exec_fn=mock_exec,
         event_count=150,
-        wait_seconds=0,  # No waiting in tests
+        wait_seconds=0,
+        warm_up_discard=100,
     )
     return runner, evidence_dir, mock_exec
 

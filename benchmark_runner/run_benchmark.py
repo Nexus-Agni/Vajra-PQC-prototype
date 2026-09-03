@@ -23,6 +23,9 @@ def main() -> None:
     logger.info("Starting benchmark campaign...")
     runner = BenchmarkRunner(
         evidence_dir=EVIDENCE_DIR,
+        event_count=5000,
+        wait_seconds=900,
+        warm_up_discard=1000,
     )
     results = runner.run()
 
