@@ -66,27 +66,27 @@ The benchmarking environment used for these evaluations is defined as follows:
 
 #### Latency Distribution Box-and-Whisker Plot
 
-![Box-and-Whisker Comparison Plot](evidence/boxplot_latency_comparison.png)
+![Box-and-Whisker Comparison Plot](../phase5/evidence/boxplot_latency_comparison.png)
 *Figure 1: Box-and-Whisker plot comparing Classical and Hybrid PQC total transaction latency distributions. It illustrates the median (P50), interquartile ranges, and tail latency outliers under both stable and adverse network topologies.*
 
 #### Cumulative Distribution Function (CDF) Overlay
 
-![CDF Overlay Plot](evidence/cdf_overlay.png)
+![CDF Overlay Plot](../phase5/evidence/cdf_overlay.png)
 *Figure 2: Overlay CDF illustrating the shift in latency percentiles for Classical (X25519) and Hybrid (X25519MLKEM768) environments. The curves denote the probability of a packet arriving within a specified timeframe, effectively showcasing the P95 and P99 long-tail degradation.*
 
 #### Per-Configuration CDFs
 The individual CDF plots below isolate performance bounds for specific suites and network conditions, confirming the consistency of the findings.
 
-![CDF X25519 Stable](evidence/cdf_X25519_stable.png)
+![CDF X25519 Stable](../phase5/evidence/cdf_X25519_stable.png)
 *Figure 3: CDF for Classical X25519 under stable conditions.*
 
-![CDF X25519 Adverse](evidence/cdf_X25519_adverse.png)
+![CDF X25519 Adverse](../phase5/evidence/cdf_X25519_adverse.png)
 *Figure 4: CDF for Classical X25519 under adverse conditions.*
 
-![CDF X25519MLKEM768 Stable](evidence/cdf_X25519MLKEM768_stable.png)
+![CDF X25519MLKEM768 Stable](../phase5/evidence/cdf_X25519MLKEM768_stable.png)
 *Figure 5: CDF for Hybrid X25519MLKEM768 under stable conditions.*
 
-![CDF X25519MLKEM768 Adverse](evidence/cdf_X25519MLKEM768_adverse.png)
+![CDF X25519MLKEM768 Adverse](../phase5/evidence/cdf_X25519MLKEM768_adverse.png)
 *Figure 6: CDF for Hybrid X25519MLKEM768 under adverse conditions.*
 
 
@@ -102,13 +102,13 @@ The individual CDF plots below isolate performance bounds for specific suites an
 ## Section 6: Raw Data References
 
 The raw data informing this report are stored locally for traceability and reproducibility:
-*   **Summary Benchmark Results:** [`benchmark_report.csv`](evidence/benchmark_report.csv)
-*   **Telemetry Logs (Gateway A):** [`telemetry_a.jsonl`](evidence/telemetry_a.jsonl)
-*   **Telemetry Logs (Gateway B):** [`telemetry_b.jsonl`](evidence/telemetry_b.jsonl)
+*   **Summary Benchmark Results:** [`benchmark_report.csv`](../phase5/evidence/benchmark_report.csv)
+*   **Telemetry Logs (Gateway A):** [`telemetry_a.jsonl`](../phase5/evidence/telemetry_a.jsonl)
+*   **Telemetry Logs (Gateway B):** [`telemetry_b.jsonl`](../phase5/evidence/telemetry_b.jsonl)
 *   **Generated Artifacts:**
-    *   [`boxplot_latency_comparison.png`](evidence/boxplot_latency_comparison.png)
-    *   [`cdf_overlay.png`](evidence/cdf_overlay.png)
-    *   [`cdf_X25519_stable.png`](evidence/cdf_X25519_stable.png)
-    *   [`cdf_X25519_adverse.png`](evidence/cdf_X25519_adverse.png)
-    *   [`cdf_X25519MLKEM768_stable.png`](evidence/cdf_X25519MLKEM768_stable.png)
-    *   [`cdf_X25519MLKEM768_adverse.png`](evidence/cdf_X25519MLKEM768_adverse.png)
+    *   [`boxplot_latency_comparison.png`](../phase5/evidence/boxplot_latency_comparison.png)
+    *   [`cdf_overlay.png`](../phase5/evidence/cdf_overlay.png)
+    *   [`cdf_X25519_stable.png`](../phase5/evidence/cdf_X25519_stable.png)
+    *   [`cdf_X25519_adverse.png`](../phase5/evidence/cdf_X25519_adverse.png)
+    *   [`cdf_X25519MLKEM768_stable.png`](../phase5/evidence/cdf_X25519MLKEM768_stable.png)
+    *   [`cdf_X25519MLKEM768_adverse.png`](../phase5/evidence/cdf_X25519MLKEM768_adverse.png)
