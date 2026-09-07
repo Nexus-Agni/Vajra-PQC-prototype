@@ -3,6 +3,10 @@ HLD_QS-TIE_Gateway_A_Sender_FINAL.md
 VAJRA-PQC_Revised_Architecture_FINAL.md
 HLD_QS-TIE_Trust_And_Key_Management_FINAL.md
 HLD_QS-TIE_Gateway_B_Receiver_FINAL.md
+CONTEXT.md
+convert.py
+JOURNAL_READINESS_AUDIT_PHASE7.md
+diff.patch
 
 # Virtual Environments
 venv/
