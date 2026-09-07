@@ -34,10 +34,15 @@ def load_jsonl(path):
     return pd.json_normalize(data)
 
 def main():
-    base_dir = Path("stat-data/archive_flawed_phase7")
-    if not base_dir.exists():
-        # Fallback to the actual path found in the repository
-        base_dir = Path("results/phase5/evidence/archive_flawed_phase7")
+    import sys
+    base_dir_arg = sys.argv[1] if len(sys.argv) > 1 else None
+    
+    if base_dir_arg:
+        base_dir = Path(base_dir_arg)
+    else:
+        base_dir = Path("stat-data/archive_flawed_phase7")
+        if not base_dir.exists():
+            base_dir = Path("results/phase5/evidence/archive_flawed_phase7")
     
     file_a = base_dir / "telemetry_a.jsonl"
     file_b = base_dir / "telemetry_b.jsonl"
@@ -85,11 +90,8 @@ def main():
     crypto_b = (df_merged['t_verified_b'] - df_merged['t_received_b']) / NS_TO_MS
     df_merged['crypto_overhead_ms'] = crypto_a + crypto_b
     
-    # Network Transit: (t_received_b - t_signed) + (t_acked - t_ingested_b)
-    # Note: If t_acked is missing or NaN, it will propagate.
-    net_transit_fwd = (df_merged['t_received_b'] - df_merged['t_signed']) / NS_TO_MS
-    net_transit_rev = (df_merged['t_acked'] - df_merged['t_ingested_b']) / NS_TO_MS
-    df_merged['network_transit_ms'] = net_transit_fwd + net_transit_rev
+    # Network Transit: (t_received_b - t_signed)
+    df_merged['network_transit_ms'] = (df_merged['t_received_b'] - df_merged['t_signed']) / NS_TO_MS
     
     # Filter out potential anomalies where latency < 0
     df_merged = df_merged[(df_merged['crypto_overhead_ms'] > 0) & (df_merged['network_transit_ms'] > 0)]
