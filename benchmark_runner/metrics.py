@@ -36,49 +36,23 @@ class MetricsCalculator:
 
         # Derived latency columns (ns → ms)
         total = (df["t_ingested_b"] - df["t_received"]) / self.NS_TO_MS
-        crypto = ((df["t_signed"] - df["t_extracted"]) + (df["t_verified_b"] - df["t_received_b"])) / self.NS_TO_MS
-        network = (df["t_received_b"] - df["t_signed"]) / self.NS_TO_MS
         
         n = len(total)
-        
-        import numpy as np
-        
-        def bootstrap_median_ci(data, n_resamples=1000, ci=0.95):
-            data = np.array(data)
-            data = data[~np.isnan(data)]
-            if len(data) == 0:
-                return 0.0, 0.0
-            
-            medians = np.zeros(n_resamples)
-            for i in range(n_resamples):
-                sample = np.random.choice(data, size=len(data), replace=True)
-                medians[i] = np.median(sample)
-                
-            alpha = 1.0 - ci
-            return np.percentile(medians, alpha / 2.0 * 100), np.percentile(medians, (1.0 - alpha / 2.0) * 100)
-
-        lower, upper = bootstrap_median_ci(total)
-        crypto_lower, crypto_upper = bootstrap_median_ci(crypto)
-        net_lower, net_upper = bootstrap_median_ci(network)
-        
         mean_latency = float(total.mean())
         std_dev = float(total.std()) if n > 1 else 0.0
+        
+        import math
+        margin_of_error = 1.96 * (std_dev / math.sqrt(n)) if n > 0 else 0.0
 
         return {
             "median_latency_ms": float(total.median()),
             "mean_latency_ms": mean_latency,
             "std_dev_ms": std_dev,
-            "ci_95_lower": float(lower),
-            "ci_95_upper": float(upper),
+            "ci_95_lower": mean_latency - margin_of_error,
+            "ci_95_upper": mean_latency + margin_of_error,
             "p95_latency_ms": float(total.quantile(0.95)),
             "p99_latency_ms": float(total.quantile(0.99)),
             "p999_latency_ms": float(total.quantile(0.999)),
-            "median_crypto_ms": float(crypto.median()),
-            "crypto_ci_95_lower": float(crypto_lower),
-            "crypto_ci_95_upper": float(crypto_upper),
-            "median_network_ms": float(network.median()),
-            "network_ci_95_lower": float(net_lower),
-            "network_ci_95_upper": float(net_upper),
             "mean_retries": float(df["retry_count"].mean()),
             "count": n,
         }

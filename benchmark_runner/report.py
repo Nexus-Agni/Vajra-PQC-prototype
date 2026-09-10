@@ -43,12 +43,10 @@ class ReportGenerator:
         
         expected_columns = [
             "crypto", "profile", "iteration", "count", 
-            "median_latency_ms", "mean_latency_ms", "std_dev_ms",
-            "ci_95_lower", "ci_95_upper", 
-            "p95_latency_ms", "p99_latency_ms", "p999_latency_ms",
-            "median_crypto_ms", "crypto_ci_95_lower", "crypto_ci_95_upper",
-            "median_network_ms", "network_ci_95_lower", "network_ci_95_upper",
-            "mean_retries", "avg_rtt_ms"
+            "median_latency_ms", "mean_latency_ms", "std_dev_ms", 
+            "ci_95_lower", "ci_95_upper", "p95_latency_ms", 
+            "p99_latency_ms", "p999_latency_ms", "mean_retries",
+            "avg_rtt_ms"
         ]
         
         # Add any missing columns just in case
