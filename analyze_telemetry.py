@@ -96,16 +96,7 @@ def main():
     # Filter out potential anomalies where latency < 0
     df_merged = df_merged[(df_merged['crypto_overhead_ms'] > 0) & (df_merged['network_transit_ms'] > 0)]
     
-    # Sample N=1000 if there are more
-    N = 1000
-    if len(df_merged) > N:
-        # Sample N events or just take first N? Let's take the first N (e.g. ignoring warmup but we just take N)
-        # We can just randomly sample or take head. 
-        # I'll just sample 1000 reproducible.
-        df_merged = df_merged.sample(n=N, random_state=42)
-    elif len(df_merged) > 0:
-        pass # use all
-    else:
+    if len(df_merged) == 0:
         print("No valid events after merging and filtering.")
         return
 
