@@ -46,8 +46,9 @@ class BenchmarkRunner:
         telemetry_a_path: Optional[str] = None,
         telemetry_b_path: Optional[str] = None,
         exec_fn: ExecFn = _default_exec,
-        event_count: int = 50,
-        wait_seconds: int = 30,
+        event_count: int = 5000,
+        wait_seconds: int = 900,
+        warm_up_discard: int = 1000,
         compose_file: str = "/app/compose.yaml",
     ) -> None:
         self._evidence_dir = evidence_dir
@@ -59,6 +60,7 @@ class BenchmarkRunner:
         )
         self._exec = exec_fn
         self._event_count = event_count
+        self._warm_up_discard = warm_up_discard
         self._wait_seconds = wait_seconds
         self._compose_file = compose_file
 
@@ -77,40 +79,56 @@ class BenchmarkRunner:
         os.makedirs(self._evidence_dir, exist_ok=True)
 
         results: List[Dict[str, Any]] = []
+        
+        # We collect all raw latency series for combined plotting
+        raw_latencies = []
 
-        for crypto_cfg in [CLASSICAL, HYBRID_PQC]:
-            logger.info("Switching to crypto mode: %s", crypto_cfg.group)
-            self._set_crypto_env(crypto_cfg)
-            self._restart_gateways()
-            time.sleep(min(self._wait_seconds, 10))
-
-            for profile in ["stable", "adverse"]:
-                logger.info(
-                    "Running profile '%s' for crypto '%s'",
-                    profile,
-                    crypto_cfg.group,
-                )
-                self._network.toggle_profile(profile)
-                time.sleep(min(self._wait_seconds, 2))
-
-                avg_rtt = self._network.probe_rtt()
-                logger.info("Measured RTT: %.3f ms", avg_rtt)
-
-                self._clear_telemetry()
-                self._inject_events(self._event_count)
-                time.sleep(self._wait_seconds)
-
-                result = self._collect_and_compute(
-                    crypto_cfg.group, profile, avg_rtt
-                )
-                if result:
-                    results.append(result)
-
-                    # Generate per-configuration CDF
-                    self._generate_cdf(crypto_cfg.group, profile)
+        for iteration in range(1, 6):
+            logger.info("Starting iteration %d/5", iteration)
+            for crypto_cfg in [CLASSICAL, HYBRID_PQC]:
+                logger.info("Switching to crypto mode: %s", crypto_cfg.group)
+                self._set_crypto_env(crypto_cfg)
+                self._restart_gateways()
+                time.sleep(min(self._wait_seconds, 10))
+    
+                for profile in ["stable", "adverse"]:
+                    logger.info(
+                        "Running profile '%s' for crypto '%s' (Iteration %d)",
+                        profile,
+                        crypto_cfg.group,
+                        iteration
+                    )
+                    self._network.toggle_profile(profile)
+                    time.sleep(min(self._wait_seconds, 2))
+    
+                    avg_rtt = self._network.probe_rtt()
+                    logger.info("Measured RTT: %.3f ms", avg_rtt)
+    
+                    self._clear_telemetry()
+                    self._inject_events(self._event_count)
+                    time.sleep(self._wait_seconds)
+    
+                    result = self._collect_and_compute(
+                        crypto_cfg.group, profile, avg_rtt
+                    )
+                    if result:
+                        result["iteration"] = iteration
+                        results.append(result)
+    
+                        # Generate per-configuration CDF (we might overwrite this with combined data, but keeping per-iteration structure for now)
+                        # To correctly match the prompt, CDF and box plots will be generated using all data in report.py
+                        # We save raw latency series for the reporter to use
+                        series = self._get_latency_series()
+                        if series is not None:
+                            raw_latencies.append({
+                                "crypto": crypto_cfg.group,
+                                "profile": profile,
+                                "iteration": iteration,
+                                "latency": series
+                            })
 
         # Final report
-        self._reporter.generate(results, self._evidence_dir)
+        self._reporter.generate(results, raw_latencies, self._evidence_dir)
         logger.info(
             "Benchmark complete. Reports saved to %s", self._evidence_dir
         )
@@ -184,7 +202,7 @@ class BenchmarkRunner:
             )
             return None
 
-        metrics = self._calc.compute(df)
+        metrics = self._calc.compute(df, warm_up_discard=self._warm_up_discard)
         if metrics is None:
             return None
 
@@ -193,14 +211,13 @@ class BenchmarkRunner:
         metrics["avg_rtt_ms"] = avg_rtt
         return metrics
 
-    def _generate_cdf(self, crypto: str, profile: str) -> None:
-        """Generate a CDF chart for the current combination."""
+    def _get_latency_series(self, warm_up_discard: Optional[int] = None) -> Optional[pd.Series]:
+        """Get the raw latency series for the current combination."""
         collector = TelemetryCollector(self._telemetry_a, self._telemetry_b)
         df = collector.collect()
-        if df.empty:
-            return
-
-        total_latency = (df["t_ingested_b"] - df["t_received"]) / 1e6
-        ReportGenerator.plot_cdf(
-            total_latency, crypto, profile, self._evidence_dir
-        )
+        discard = warm_up_discard if warm_up_discard is not None else self._warm_up_discard
+        if df.empty or len(df) <= discard:
+            return None
+        
+        df = df.iloc[discard:].copy()
+        return (df["t_ingested_b"] - df["t_received"]) / 1e6

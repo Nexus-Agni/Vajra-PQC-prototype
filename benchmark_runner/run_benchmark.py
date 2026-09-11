@@ -17,12 +17,15 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+EVIDENCE_DIR = "/app/results/phase5/evidence"
+
 def main() -> None:
     logger.info("Starting benchmark campaign...")
     runner = BenchmarkRunner(
-        evidence_dir="/app/results/phase5/evidence",
-        event_count=50,
-        wait_seconds=30,
+        evidence_dir=EVIDENCE_DIR,
+        event_count=5000,
+        wait_seconds=900,
+        warm_up_discard=1000,
     )
     results = runner.run()
 
@@ -32,8 +35,9 @@ def main() -> None:
 
     logger.info(
         "Benchmark complete: %d configurations tested. "
-        "Reports saved to /app/results/phase5/evidence/",
+        "Reports saved to %s/",
         len(results),
+        EVIDENCE_DIR,
     )
 
 

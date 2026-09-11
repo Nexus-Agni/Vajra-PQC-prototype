@@ -668,3 +668,5 @@
 {"transaction_id": "16737b8e-b082-41f9-adc8-d0e32ce66da4", "reason": "MAX_RETRIES_EXCEEDED", "state": "failed", "timestamp": "2026-08-30T15:59:29.273824"}
 {"transaction_id": "0decede1-45da-4bc2-b7fc-6788052a74ff", "reason": "MAX_RETRIES_EXCEEDED", "state": "failed", "timestamp": "2026-08-30T15:59:29.373848"}
 {"transaction_id": "f5be9f50-9000-4a4e-86ac-078c763abdf0", "reason": "MAX_RETRIES_EXCEEDED", "state": "failed", "timestamp": "2026-08-30T16:37:18.446834"}
+{"transaction_id": "ed4fc129-4f3d-4f04-a3ce-8726f1901610", "reason": "MAX_RETRIES_EXCEEDED", "state": "failed", "timestamp": "2026-09-03T02:33:42.372808"}
+{"transaction_id": "ea85fd4f-8d63-4e7d-bfc0-1892b5e062ff", "reason": "MAX_RETRIES_EXCEEDED", "state": "failed", "timestamp": "2026-09-03T02:33:42.590898"}
