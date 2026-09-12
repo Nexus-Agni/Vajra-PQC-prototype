@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import os
+import shutil
 import time
 from typing import Callable, Dict, Any, List, Optional
 
@@ -128,6 +129,18 @@ class BenchmarkRunner:
                                 "iteration": iteration,
                                 "latency": series
                             })
+
+                        # Archive the raw telemetry files to prevent data loss when _clear_telemetry runs next
+                        raw_dir = os.path.join(self._evidence_dir, "raw")
+                        os.makedirs(raw_dir, exist_ok=True)
+                        for base_path in (self._telemetry_a, self._telemetry_b):
+                            if os.path.exists(base_path):
+                                fname = os.path.basename(base_path).replace(
+                                    ".jsonl",
+                                    f"_{crypto_cfg.group}_{profile}_iter{iteration}.jsonl"
+                                )
+                                shutil.copy2(base_path, os.path.join(raw_dir, fname))
+
 
         # Final report
         self._reporter.generate(results, raw_latencies, self._evidence_dir)
