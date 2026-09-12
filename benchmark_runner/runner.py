@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 import os
+import shutil
 import time
 from typing import Callable, Dict, Any, List, Optional
 
@@ -50,6 +51,7 @@ class BenchmarkRunner:
         wait_seconds: int = 900,
         warm_up_discard: int = 1000,
         compose_file: str = "/app/compose.yaml",
+        iterations: int = 5,
     ) -> None:
         self._evidence_dir = evidence_dir
         self._telemetry_a = telemetry_a_path or os.path.join(
@@ -63,6 +65,7 @@ class BenchmarkRunner:
         self._warm_up_discard = warm_up_discard
         self._wait_seconds = wait_seconds
         self._compose_file = compose_file
+        self._iterations = iterations
 
         self._network = NetworkController(exec_fn=exec_fn)
         self._calc = MetricsCalculator()
@@ -83,8 +86,8 @@ class BenchmarkRunner:
         # We collect all raw latency series for combined plotting
         raw_latencies = []
 
-        for iteration in range(1, 6):
-            logger.info("Starting iteration %d/5", iteration)
+        for iteration in range(1, self._iterations + 1):
+            logger.info("Starting iteration %d/%d", iteration, self._iterations)
             for crypto_cfg in [CLASSICAL, HYBRID_PQC]:
                 logger.info("Switching to crypto mode: %s", crypto_cfg.group)
                 self._set_crypto_env(crypto_cfg)
@@ -126,6 +129,18 @@ class BenchmarkRunner:
                                 "iteration": iteration,
                                 "latency": series
                             })
+
+                        # Archive the raw telemetry files to prevent data loss when _clear_telemetry runs next
+                        raw_dir = os.path.join(self._evidence_dir, "raw")
+                        os.makedirs(raw_dir, exist_ok=True)
+                        for base_path in (self._telemetry_a, self._telemetry_b):
+                            if os.path.exists(base_path):
+                                fname = os.path.basename(base_path).replace(
+                                    ".jsonl",
+                                    f"_{crypto_cfg.group}_{profile}_iter{iteration}.jsonl"
+                                )
+                                shutil.copy2(base_path, os.path.join(raw_dir, fname))
+
 
         # Final report
         self._reporter.generate(results, raw_latencies, self._evidence_dir)

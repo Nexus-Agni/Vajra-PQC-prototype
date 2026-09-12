@@ -1,0 +1,276 @@
+﻿diff --git a/analyze_telemetry.py b/analyze_telemetry.py
+new file mode 100644
+index 0000000..8e4bd48
+--- /dev/null
++++ b/analyze_telemetry.py
+@@ -0,0 +1,130 @@
++import json
++import numpy as np
++import pandas as pd
++from pathlib import Path
++
++def bootstrap_median_ci(data, n_resamples=1000, ci=0.95):
++    """Calculate bootstrapped median confidence interval."""
++    # Remove NaNs
++    data = np.array(data)
++    data = data[~np.isnan(data)]
++    n = len(data)
++    if n == 0:
++        return 0.0, 0.0
++    
++    medians = np.zeros(n_resamples)
++    for i in range(n_resamples):
++        sample = np.random.choice(data, size=n, replace=True)
++        medians[i] = np.median(sample)
++        
++    alpha = 1.0 - ci
++    lower = np.percentile(medians, alpha / 2.0 * 100)
++    upper = np.percentile(medians, (1.0 - alpha / 2.0) * 100)
++    return lower, upper
++
++def load_jsonl(path):
++    data = []
++    with open(path, 'r') as f:
++        for line in f:
++            if not line.strip(): continue
++            try:
++                data.append(json.loads(line))
++            except json.JSONDecodeError:
++                continue
++    return pd.json_normalize(data)
++
++def main():
++    import sys
++    base_dir_arg = sys.argv[1] if len(sys.argv) > 1 else None
++    
++    if base_dir_arg:
++        base_dir = Path(base_dir_arg)
++    else:
++        base_dir = Path("stat-data/archive_flawed_phase7")
++        if not base_dir.exists():
++            base_dir = Path("results/phase5/evidence/archive_flawed_phase7")
++    
++    file_a = base_dir / "telemetry_a.jsonl"
++    file_b = base_dir / "telemetry_b.jsonl"
++    
++    if not file_a.exists() or not file_b.exists():
++        print(f"Error: Could not find telemetry files in {base_dir}")
++        return
++        
++    df_a = load_jsonl(file_a)
++    df_b = load_jsonl(file_b)
++    
++    # Rename columns to remove 'telemetry.' prefix if present
++    df_a.columns = [c.replace('telemetry.', '') for c in df_a.columns]
++    df_b.columns = [c.replace('telemetry.', '') for c in df_b.columns]
++    
++    # Group A by transaction_id using earliest/latest timestamps
++    agg_a = {
++        't_received': 'min',
++        't_extracted': 'min',
++        't_signed': 'max',
++        't_acked': 'max'
++    }
++    # only aggregate columns that exist
++    agg_a = {k: v for k, v in agg_a.items() if k in df_a.columns}
++    df_a_grouped = df_a.groupby('transaction_id').agg(agg_a).reset_index()
++    
++    # Group B by transaction_id using earliest/latest timestamps
++    agg_b = {
++        't_received_b': 'min',
++        't_verified_b': 'min',
++        't_ingested_b': 'max'
++    }
++    agg_b = {k: v for k, v in agg_b.items() if k in df_b.columns}
++    df_b_grouped = df_b.groupby('transaction_id').agg(agg_b).reset_index()
++    
++    # Join A and B
++    df_merged = pd.merge(df_a_grouped, df_b_grouped, on='transaction_id', how='inner')
++    
++    # Decompose Latency
++    # Convert ns to ms
++    NS_TO_MS = 1e6
++    
++    # Crypto Overhead: (t_signed - t_extracted) + (t_verified_b - t_received_b)
++    crypto_a = (df_merged['t_signed'] - df_merged['t_extracted']) / NS_TO_MS
++    crypto_b = (df_merged['t_verified_b'] - df_merged['t_received_b']) / NS_TO_MS
++    df_merged['crypto_overhead_ms'] = crypto_a + crypto_b
++    
++    # Network Transit: (t_received_b - t_signed)
++    df_merged['network_transit_ms'] = (df_merged['t_received_b'] - df_merged['t_signed']) / NS_TO_MS
++    
++    # Filter out potential anomalies where latency < 0
++    df_merged = df_merged[(df_merged['crypto_overhead_ms'] > 0) & (df_merged['network_transit_ms'] > 0)]
++    
++    # Sample N=1000 if there are more
++    N = 1000
++    if len(df_merged) > N:
++        # Sample N events or just take first N? Let's take the first N (e.g. ignoring warmup but we just take N)
++        # We can just randomly sample or take head. 
++        # I'll just sample 1000 reproducible.
++        df_merged = df_merged.sample(n=N, random_state=42)
++    elif len(df_merged) > 0:
++        pass # use all
++    else:
++        print("No valid events after merging and filtering.")
++        return
++
++    # Calculate Bootstrapped Median CIs
++    crypto_median = df_merged['crypto_overhead_ms'].median()
++    crypto_lower, crypto_upper = bootstrap_median_ci(df_merged['crypto_overhead_ms'])
++    
++    network_median = df_merged['network_transit_ms'].median()
++    network_lower, network_upper = bootstrap_median_ci(df_merged['network_transit_ms'])
++    
++    print(f"Summary Statistics (N={len(df_merged)}):")
++    print(f"----------------------------------------")
++    print(f"Crypto Overhead:")
++    print(f"  Median: {crypto_median:.4f} ms")
++    print(f"  95% CI: [{crypto_lower:.4f}, {crypto_upper:.4f}] ms")
++    print()
++    print(f"Network Transit:")
++    print(f"  Median: {network_median:.4f} ms")
++    print(f"  95% CI: [{network_lower:.4f}, {network_upper:.4f}] ms")
++
++if __name__ == "__main__":
++    main()
+diff --git a/benchmark_runner/metrics.py b/benchmark_runner/metrics.py
+index 282d296..0d098e1 100644
+--- a/benchmark_runner/metrics.py
++++ b/benchmark_runner/metrics.py
+@@ -36,23 +36,49 @@ class MetricsCalculator:
+ 
+         # Derived latency columns (ns ΓåÆ ms)
+         total = (df["t_ingested_b"] - df["t_received"]) / self.NS_TO_MS
++        crypto = ((df["t_signed"] - df["t_extracted"]) + (df["t_verified_b"] - df["t_received_b"])) / self.NS_TO_MS
++        network = (df["t_received_b"] - df["t_signed"]) / self.NS_TO_MS
+         
+         n = len(total)
++        
++        import numpy as np
++        
++        def bootstrap_median_ci(data, n_resamples=1000, ci=0.95):
++            data = np.array(data)
++            data = data[~np.isnan(data)]
++            if len(data) == 0:
++                return 0.0, 0.0
++            
++            medians = np.zeros(n_resamples)
++            for i in range(n_resamples):
++                sample = np.random.choice(data, size=len(data), replace=True)
++                medians[i] = np.median(sample)
++                
++            alpha = 1.0 - ci
++            return np.percentile(medians, alpha / 2.0 * 100), np.percentile(medians, (1.0 - alpha / 2.0) * 100)
++
++        lower, upper = bootstrap_median_ci(total)
++        crypto_lower, crypto_upper = bootstrap_median_ci(crypto)
++        net_lower, net_upper = bootstrap_median_ci(network)
++        
+         mean_latency = float(total.mean())
+         std_dev = float(total.std()) if n > 1 else 0.0
+-        
+-        import math
+-        margin_of_error = 1.96 * (std_dev / math.sqrt(n)) if n > 0 else 0.0
+ 
+         return {
+             "median_latency_ms": float(total.median()),
+             "mean_latency_ms": mean_latency,
+             "std_dev_ms": std_dev,
+-            "ci_95_lower": mean_latency - margin_of_error,
+-            "ci_95_upper": mean_latency + margin_of_error,
++            "ci_95_lower": float(lower),
++            "ci_95_upper": float(upper),
+             "p95_latency_ms": float(total.quantile(0.95)),
+             "p99_latency_ms": float(total.quantile(0.99)),
+             "p999_latency_ms": float(total.quantile(0.999)),
++            "median_crypto_ms": float(crypto.median()),
++            "crypto_ci_95_lower": float(crypto_lower),
++            "crypto_ci_95_upper": float(crypto_upper),
++            "median_network_ms": float(network.median()),
++            "network_ci_95_lower": float(net_lower),
++            "network_ci_95_upper": float(net_upper),
+             "mean_retries": float(df["retry_count"].mean()),
+             "count": n,
+         }
+diff --git a/benchmark_runner/report.py b/benchmark_runner/report.py
+index afb07d9..4cc8c01 100644
+--- a/benchmark_runner/report.py
++++ b/benchmark_runner/report.py
+@@ -43,10 +43,12 @@ class ReportGenerator:
+         
+         expected_columns = [
+             "crypto", "profile", "iteration", "count", 
+-            "median_latency_ms", "mean_latency_ms", "std_dev_ms", 
+-            "ci_95_lower", "ci_95_upper", "p95_latency_ms", 
+-            "p99_latency_ms", "p999_latency_ms", "mean_retries",
+-            "avg_rtt_ms"
++            "median_latency_ms", "mean_latency_ms", "std_dev_ms",
++            "ci_95_lower", "ci_95_upper", 
++            "p95_latency_ms", "p99_latency_ms", "p999_latency_ms",
++            "median_crypto_ms", "crypto_ci_95_lower", "crypto_ci_95_upper",
++            "median_network_ms", "network_ci_95_lower", "network_ci_95_upper",
++            "mean_retries", "avg_rtt_ms"
+         ]
+         
+         # Add any missing columns just in case
+diff --git a/results/phase5/evidence/benchmark_report.csv b/stat-data/archive_flawed_phase7/benchmark_report.csv
+similarity index 100%
+rename from results/phase5/evidence/benchmark_report.csv
+rename to stat-data/archive_flawed_phase7/benchmark_report.csv
+diff --git a/results/phase5/evidence/boxplot_latency_comparison.png b/stat-data/archive_flawed_phase7/boxplot_latency_comparison.png
+similarity index 100%
+rename from results/phase5/evidence/boxplot_latency_comparison.png
+rename to stat-data/archive_flawed_phase7/boxplot_latency_comparison.png
+diff --git a/results/phase5/evidence/cdf_X25519MLKEM768_adverse.png b/stat-data/archive_flawed_phase7/cdf_X25519MLKEM768_adverse.png
+similarity index 100%
+rename from results/phase5/evidence/cdf_X25519MLKEM768_adverse.png
+rename to stat-data/archive_flawed_phase7/cdf_X25519MLKEM768_adverse.png
+diff --git a/results/phase5/evidence/cdf_X25519MLKEM768_stable.png b/stat-data/archive_flawed_phase7/cdf_X25519MLKEM768_stable.png
+similarity index 100%
+rename from results/phase5/evidence/cdf_X25519MLKEM768_stable.png
+rename to stat-data/archive_flawed_phase7/cdf_X25519MLKEM768_stable.png
+diff --git a/results/phase5/evidence/cdf_X25519_adverse.png b/stat-data/archive_flawed_phase7/cdf_X25519_adverse.png
+similarity index 100%
+rename from results/phase5/evidence/cdf_X25519_adverse.png
+rename to stat-data/archive_flawed_phase7/cdf_X25519_adverse.png
+diff --git a/results/phase5/evidence/cdf_X25519_stable.png b/stat-data/archive_flawed_phase7/cdf_X25519_stable.png
+similarity index 100%
+rename from results/phase5/evidence/cdf_X25519_stable.png
+rename to stat-data/archive_flawed_phase7/cdf_X25519_stable.png
+diff --git a/results/phase5/evidence/cdf_overlay.png b/stat-data/archive_flawed_phase7/cdf_overlay.png
+similarity index 100%
+rename from results/phase5/evidence/cdf_overlay.png
+rename to stat-data/archive_flawed_phase7/cdf_overlay.png
+diff --git a/tests/test_analyze_telemetry.py b/tests/test_analyze_telemetry.py
+new file mode 100644
+index 0000000..1229aa7
+--- /dev/null
++++ b/tests/test_analyze_telemetry.py
+@@ -0,0 +1,26 @@
++import pytest
++import numpy as np
++import pandas as pd
++import sys
++from pathlib import Path
++sys.path.insert(0, str(Path(__file__).parent.parent))
++from analyze_telemetry import bootstrap_median_ci
++
++def test_bootstrap_median_ci():
++    # Simple deterministic check
++    data = [10.0] * 100
++    lower, upper = bootstrap_median_ci(data, n_resamples=100)
++    assert lower == 10.0
++    assert upper == 10.0
++    
++    # Check bounds
++    np.random.seed(42)
++    data_2 = np.random.normal(50, 10, 1000) # median around 50
++    lower_2, upper_2 = bootstrap_median_ci(data_2, n_resamples=200)
++    assert 48.0 < lower_2 < 52.0
++    assert 48.0 < upper_2 < 52.0
++
++def test_empty_data():
++    lower, upper = bootstrap_median_ci([], n_resamples=100)
++    assert lower == 0.0
++    assert upper == 0.0
